@@ -1,0 +1,33 @@
+:root { --bg: #0f1115; --card: #171a21; --border: #2a2e38; --text: #e6e8ee; --muted: #8b90a0; --accent: #3b82f6; --danger: #ef4444; --ok: #22c55e; }
+* { box-sizing: border-box; }
+body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); }
+header { display: flex; align-items: center; gap: 16px; padding: 16px 24px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--bg); }
+header h1 { font-size: 18px; margin: 0; flex: 0 0 auto; }
+.path { color: var(--muted); font-size: 12px; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+main { padding: 24px; max-width: 960px; margin: 0 auto; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; cursor: grab; }
+.card.active { border-color: var(--accent); }
+.card .top { display: flex; align-items: center; gap: 8px; }
+.card .name { font-weight: 600; }
+.badge { font-size: 11px; padding: 2px 8px; border-radius: 999px; background: var(--accent); color: #fff; }
+.badge.off { background: var(--border); color: var(--muted); }
+.card .meta { color: var(--muted); font-size: 12px; margin: 6px 0; word-break: break-all; }
+.card .ops { display: flex; gap: 8px; margin-top: 10px; }
+button { background: var(--border); color: var(--text); border: 0; border-radius: 6px; padding: 6px 12px; cursor: pointer; font-size: 13px; }
+button:hover { filter: brightness(1.2); }
+button.primary { background: var(--accent); color: #fff; }
+button.danger { background: transparent; color: var(--danger); border: 1px solid var(--danger); }
+.empty { color: var(--muted); text-align: center; margin-top: 60px; }
+.hidden { display: none; }
+dialog { background: var(--card); color: var(--text); border: 1px solid var(--border); border-radius: 12px; padding: 24px; width: 480px; max-width: 90vw; }
+dialog form { display: flex; flex-direction: column; gap: 10px; }
+dialog label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--muted); }
+dialog input { background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 6px; padding: 8px; }
+fieldset { border: 1px solid var(--border); border-radius: 8px; display: flex; flex-direction: column; gap: 8px; }
+.row { display: flex; gap: 8px; }
+.row input { flex: 1; }
+.actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }
+.model-row { display: flex; gap: 8px; align-items: center; }
+.model-row input { flex: 1; }
+.model-row button { padding: 2px 8px; }

@@ -184,9 +184,19 @@ const server = Bun.serve({
     // 静态资源
     let filePath = normalize(join(PUBLIC_DIR, pathname === "/" ? "index.html" : pathname));
     if (!filePath.startsWith(PUBLIC_DIR)) return fail(403, "forbidden");
-    if (!existsSync(filePath) || !filePath.endsWith(".html")) return fail(404, "not found");
+    if (!existsSync(filePath) || !filePath.startsWith(PUBLIC_DIR)) return fail(404, "not found");
+    const ext = filePath.split(".").pop()?.toLowerCase() ?? "";
+    const mime: Record<string, string> = {
+      html: "text/html; charset=utf-8",
+      css: "text/css; charset=utf-8",
+      js: "application/javascript; charset=utf-8",
+      json: "application/json; charset=utf-8",
+      svg: "image/svg+xml",
+      png: "image/png",
+      ico: "image/x-icon",
+    };
     return new Response(readFileSync(filePath), {
-      headers: { "Content-Type": "text/html; charset=utf-8" },
+      headers: { "Content-Type": mime[ext] ?? "application/octet-stream" },
     });
   },
 });

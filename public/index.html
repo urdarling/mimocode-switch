@@ -1,5 +1,48 @@
 <!doctype html>
 <html lang="zh-CN">
-<head><meta charset="utf-8"><title>mimocode 供应商管理</title></head>
-<body><h1>mimocode 供应商管理</h1><p>占位页,Task 6 实现 UI</p></body>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>mimocode 供应商管理</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header>
+    <h1>mimocode 供应商管理</h1>
+    <span id="config-path" class="path"></span>
+    <button id="btn-add" class="primary">+ 添加供应商</button>
+  </header>
+  <main>
+    <div id="list" class="cards"></div>
+    <p id="empty" class="empty hidden">暂无供应商,点击右上角添加。</p>
+  </main>
+
+  <dialog id="form-dialog">
+    <form id="provider-form" method="dialog">
+      <h2 id="form-title">添加供应商</h2>
+      <input type="hidden" id="f-original-id">
+      <label>供应商标识 <input id="f-id" required pattern="[a-z0-9-]+" placeholder="my-provider"></label>
+      <label>名称 <input id="f-name" required placeholder="例如:某中转站"></label>
+      <label>API Key <input id="f-apiKey" required placeholder="sk-..."></label>
+      <label>Base URL <input id="f-baseURL" required placeholder="https://api.example.com/v1"></label>
+      <label>备注 <input id="f-note" placeholder="可选"></label>
+      <label>官网链接 <input id="f-link" type="url" placeholder="可选 https://..."></label>
+      <fieldset>
+        <legend>模型配置</legend>
+        <div id="models"></div>
+        <div class="row">
+          <input id="f-model-new" placeholder="模型 id,如 deepseek-v4-flash">
+          <button type="button" id="btn-add-model">添加模型</button>
+          <button type="button" id="btn-fetch-models">获取模型</button>
+        </div>
+      </fieldset>
+      <div class="actions">
+        <button type="button" id="btn-cancel">取消</button>
+        <button type="submit" class="primary">保存</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="/app.js"></script>
+</body>
 </html>
