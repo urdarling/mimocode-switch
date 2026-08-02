@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { homedir } from "node:os";
 
@@ -7,20 +8,32 @@ export interface ConfigPaths {
   backupDir: string;
 }
 
-export function resolveConfigPaths(): ConfigPaths {
-  let base: string;
-  const mimoHome = process.env.MIMOCODE_HOME;
+// mimocode 的配置文件候选顺序(与源码 config.ts 的 globalConfigFile 一致)
+const CONFIG_FILE_CANDIDATES = ["mimocode.jsonc", "mimocode.json", "config.json"];
+
+function pickConfigFile(dir: string): string {
+  for (const name of CONFIG_FILE_CANDIDATES) {
+    const file = join(dir, name);
+    if (existsSync(file)) return file;
+  }
+  return join(dir, CONFIG_FILE_CANDIDATES[0]);
+}
+
+// 与 mimocode 源码 resolveMimocodeHome 一致:
+// - MIMOCODE_HOME 设置时,config 目录为 $MIMOCODE_HOME/config
+// - 否则用 XDG 默认: ~/.config/mimocode(Windows 也如此,mimocode 不遵循 %LOCALAPPDATA%)
+export function resolveConfigPaths(env: NodeJS.ProcessEnv = process.env): ConfigPaths {
+  let configDir: string;
+  const mimoHome = env.MIMOCODE_HOME;
   if (mimoHome) {
-    base = mimoHome;
-  } else if (process.platform === "win32") {
-    const local = process.env.LOCALAPPDATA ?? join(homedir(), "AppData", "Local");
-    base = join(local, "mimocode");
+    configDir = join(mimoHome, "config");
   } else {
-    base = join(homedir(), ".config", "mimocode");
+    const home = env.HOME || env.USERPROFILE || homedir();
+    configDir = join(home, ".config", "mimocode");
   }
   return {
-    configFile: join(base, "mimocode.jsonc"),
-    metadataFile: join(base, "mimocode-ui.json"),
-    backupDir: join(base, "backups"),
+    configFile: pickConfigFile(configDir),
+    metadataFile: join(configDir, "mimocode-ui.json"),
+    backupDir: join(configDir, "backups"),
   };
 }
