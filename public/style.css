@@ -18,6 +18,8 @@ button { background: var(--border); color: var(--text); border: 0; border-radius
 button:hover { filter: brightness(1.2); }
 button.primary { background: var(--accent); color: #fff; }
 button.danger { background: transparent; color: var(--danger); border: 1px solid var(--danger); }
+select { background: var(--border); color: var(--text); border: 0; border-radius: 6px; padding: 6px 8px; font-size: 13px; cursor: pointer; }
+dialog select { background: var(--bg); border: 1px solid var(--border); padding: 8px; }
 .empty { color: var(--muted); text-align: center; margin-top: 60px; }
 .hidden { display: none; }
 dialog { background: var(--card); color: var(--text); border: 1px solid var(--border); border-radius: 12px; padding: 24px; width: 480px; max-width: 90vw; }

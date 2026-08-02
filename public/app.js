@@ -40,17 +40,23 @@ function render() {
     card.className = "card" + (p.isDefault ? " active" : "");
     card.draggable = true;
     card.dataset.id = id;
+    const modelKeys = Object.keys(p.config.models ?? {});
+    const activeMid = state.activeModel.startsWith(id + "/") ? state.activeModel.slice(id.length + 1) : "";
     card.innerHTML = `
       <div class="top">
         <span class="drag">≡</span>
         <span class="name">${escapeHtml(p.config.name ?? id)}</span>
-        ${p.isDefault ? '<span class="badge">默认</span>' : ""}
+        ${p.isDefault ? `<span class="badge">默认 · ${escapeHtml(activeMid)}</span>` : ""}
       </div>
       <div class="meta">${escapeHtml(p.config.options?.baseURL ?? "")}</div>
       ${state.metadata.notes?.[id] ? `<div class="meta">📝 ${escapeHtml(state.metadata.notes[id])}</div>` : ""}
-      <div class="meta">${(Object.keys(p.config.models ?? {})).length} 个模型</div>
+      <div class="meta">${modelKeys.length} 个模型</div>
       <div class="ops">
-        ${p.isDefault ? "" : `<button data-act="activate" data-id="${id}">设为默认</button>`}
+        ${p.isDefault
+          ? ""
+          : modelKeys.length > 0
+            ? `<select class="activate-select" data-id="${id}"><option value="" selected disabled>设为默认…</option>${modelKeys.map((m) => `<option value="${escapeHtml(m)}">${escapeHtml(m)}</option>`).join("")}</select>`
+            : `<button data-act="activate" data-id="${id}">设为默认</button>`}
         <button data-act="edit" data-id="${id}">编辑</button>
         <button data-act="dup" data-id="${id}">复制</button>
         <button data-act="del" data-id="${id}" class="danger">删除</button>
@@ -95,7 +101,20 @@ function openForm(provider) {
   $("#f-link").value = state.metadata.links?.[provider?.id] ?? "";
   $("#f-default").checked = provider?.isDefault ?? false;
   renderModels();
+  if (provider?.isDefault) {
+    const mid = (state.activeModel || "").startsWith(provider.id + "/") ? state.activeModel.slice(provider.id.length + 1) : "";
+    if (mid && models[mid]) $("#f-default-model").value = mid;
+  }
   dialog.showModal();
+}
+
+function syncDefaultModelUI() {
+  const checked = $("#f-default").checked;
+  const has = Object.keys(models).length > 0;
+  $("#default-model-row").hidden = !(checked && has);
+  const sel = $("#f-default-model");
+  sel.disabled = !(checked && has);
+  if (checked && has && !sel.value) sel.selectedIndex = 0;
 }
 
 function renderModels() {
@@ -110,10 +129,22 @@ function renderModels() {
     row.appendChild(del);
     modelsEl.appendChild(row);
   });
+  const sel = $("#f-default-model");
+  const prev = sel.value;
+  sel.innerHTML = "";
+  Object.keys(models).forEach((mid) => {
+    const opt = document.createElement("option");
+    opt.value = mid;
+    opt.textContent = mid;
+    sel.appendChild(opt);
+  });
+  if (prev && models[prev]) sel.value = prev;
+  syncDefaultModelUI();
 }
 
 $("#btn-add").onclick = () => openForm(null);
 $("#btn-cancel").onclick = () => dialog.close();
+$("#f-default").addEventListener("change", syncDefaultModelUI);
 
 $("#btn-add-model").onclick = () => {
   const input = $("#f-model-new");
@@ -156,10 +187,10 @@ $("#provider-form").addEventListener("submit", async (e) => {
       savedId = $("#f-id").value;
       await api("/api/providers", { method: "POST", body: JSON.stringify({ id: savedId, ...payload }) });
     }
-    // 勾选「设为默认」则把 model 指针切到该供应商的第一个模型
+    // 勾选「设为默认」则把 model 指针切到该供应商的所选模型
     if ($("#f-default").checked) {
       const modelIds = Object.keys(models);
-      const modelId = modelIds.length > 0 ? modelIds[0] : `${savedId}-default`;
+      const modelId = $("#f-default-model").value || modelIds[0] || `${savedId}-default`;
       await api(`/api/providers/${savedId}/activate`, { method: "POST", body: JSON.stringify({ modelId }) });
     }
     dialog.close();
@@ -170,6 +201,17 @@ $("#provider-form").addEventListener("submit", async (e) => {
 });
 
 // ---- 列表操作 ----
+listEl.addEventListener("change", async (e) => {
+  const sel = e.target.closest("select.activate-select");
+  if (!sel || !sel.value) return;
+  try {
+    await api(`/api/providers/${sel.dataset.id}/activate`, { method: "POST", body: JSON.stringify({ modelId: sel.value }) });
+    await refresh();
+  } catch (err) {
+    alert(err.message);
+  }
+});
+
 listEl.addEventListener("click", async (e) => {
   const btn = e.target.closest("button[data-act]");
   if (!btn) return;
