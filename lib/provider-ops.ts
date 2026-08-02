@@ -44,12 +44,12 @@ export function buildProvider(input: Omit<ProviderInput, "id">): ProviderConfig 
   return p;
 }
 
-export function listProviders(config: ConfigData): { id: string; active: boolean; config: ProviderConfig }[] {
+export function listProviders(config: ConfigData): { id: string; isDefault: boolean; config: ProviderConfig }[] {
   const providers = config.provider ?? {};
   const active = config.model ?? "";
   return Object.entries(providers).map(([id, cfg]) => ({
     id,
-    active: active.startsWith(`${id}/`),
+    isDefault: active.startsWith(`${id}/`),
     config: cfg ?? {},
   }));
 }
@@ -76,13 +76,22 @@ export function updateProvider(config: ConfigData, id: string, input: Omit<Provi
 export function removeProvider(config: ConfigData, id: string): ConfigData {
   const providers = config.provider ?? {};
   if (!providers[id]) return config;
-  const active = config.model ?? "";
-  if (active.startsWith(`${id}/`)) {
-    throw new Error(`供应商 ${id} 正在启用中,请先切换到其他供应商`);
-  }
   const next = { ...providers };
   delete next[id];
-  return { ...config, provider: next };
+  // additive 模式:删除默认供应商后,model 指针重定向到剩余第一个,避免悬空
+  let model: string | undefined = config.model;
+  const isDefault = (config.model ?? "").startsWith(`${id}/`);
+  if (isDefault) {
+    const remaining = Object.keys(next);
+    if (remaining.length === 0) {
+      model = undefined;
+    } else {
+      const fallback = remaining[0];
+      const fallbackModels = Object.keys(next[fallback]?.models ?? {});
+      model = fallbackModels.length > 0 ? `${fallback}/${fallbackModels[0]}` : `${fallback}/`;
+    }
+  }
+  return { ...config, provider: next, model };
 }
 
 export function activateProvider(config: ConfigData, id: string, modelId: string): ConfigData {

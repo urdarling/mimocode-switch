@@ -37,20 +37,20 @@ function render() {
     const p = state.providers.find((x) => x.id === id);
     if (!p) return;
     const card = document.createElement("div");
-    card.className = "card" + (p.active ? " active" : "");
+    card.className = "card" + (p.isDefault ? " active" : "");
     card.draggable = true;
     card.dataset.id = id;
     card.innerHTML = `
       <div class="top">
         <span class="drag">≡</span>
         <span class="name">${escapeHtml(p.config.name ?? id)}</span>
-        <span class="badge ${p.active ? "" : "off"}">${p.active ? "启用中" : "未启用"}</span>
+        ${p.isDefault ? '<span class="badge">默认</span>' : ""}
       </div>
       <div class="meta">${escapeHtml(p.config.options?.baseURL ?? "")}</div>
       ${state.metadata.notes?.[id] ? `<div class="meta">📝 ${escapeHtml(state.metadata.notes[id])}</div>` : ""}
       <div class="meta">${(Object.keys(p.config.models ?? {})).length} 个模型</div>
       <div class="ops">
-        ${p.active ? "" : `<button data-act="activate" data-id="${id}">启用</button>`}
+        ${p.isDefault ? "" : `<button data-act="activate" data-id="${id}">设为默认</button>`}
         <button data-act="edit" data-id="${id}">编辑</button>
         <button data-act="dup" data-id="${id}">复制</button>
         <button data-act="del" data-id="${id}" class="danger">删除</button>
@@ -93,6 +93,7 @@ function openForm(provider) {
   $("#f-baseURL").value = provider?.config?.options?.baseURL ?? "";
   $("#f-note").value = state.metadata.notes?.[provider?.id] ?? "";
   $("#f-link").value = state.metadata.links?.[provider?.id] ?? "";
+  $("#f-default").checked = provider?.isDefault ?? false;
   renderModels();
   dialog.showModal();
 }
@@ -148,10 +149,18 @@ $("#provider-form").addEventListener("submit", async (e) => {
     models,
   };
   try {
+    let savedId = editingId;
     if (editingId) {
       await api(`/api/providers/${editingId}`, { method: "PUT", body: JSON.stringify(payload) });
     } else {
-      await api("/api/providers", { method: "POST", body: JSON.stringify({ id: $("#f-id").value, ...payload }) });
+      savedId = $("#f-id").value;
+      await api("/api/providers", { method: "POST", body: JSON.stringify({ id: savedId, ...payload }) });
+    }
+    // 勾选「设为默认」则把 model 指针切到该供应商的第一个模型
+    if ($("#f-default").checked) {
+      const modelIds = Object.keys(models);
+      const modelId = modelIds.length > 0 ? modelIds[0] : `${savedId}-default`;
+      await api(`/api/providers/${savedId}/activate`, { method: "POST", body: JSON.stringify({ modelId }) });
     }
     dialog.close();
     await refresh();
@@ -178,7 +187,11 @@ listEl.addEventListener("click", async (e) => {
     } else if (act === "dup") {
       await api(`/api/providers/${id}/duplicate`, { method: "POST" });
     } else if (act === "del") {
-      if (!confirm(`删除供应商 ${id}?`)) return;
+      const isDefault = p.isDefault;
+      const msg = isDefault
+        ? `删除供应商 ${id}?这是当前默认供应商,删除后默认会自动切到其他供应商。`
+        : `删除供应商 ${id}?`;
+      if (!confirm(msg)) return;
       await api(`/api/providers/${id}`, { method: "DELETE" });
     }
     await refresh();

@@ -24,9 +24,10 @@ describe("buildProvider", () => {
 });
 
 describe("listProviders", () => {
-  test("返回激活标记", () => {
+  test("返回默认标记(model 指针指向的为默认)", () => {
     const list = listProviders(base());
-    expect(list.find((x) => x.id === "a")!.active).toBe(true);
+    expect(list.find((x) => x.id === "a")!.isDefault).toBe(true);
+    expect(list.find((x) => x.id === "a")!.active).toBeUndefined();
   });
 });
 
@@ -53,13 +54,26 @@ describe("updateProvider", () => {
 });
 
 describe("removeProvider", () => {
-  test("删除非激活成功", () => {
+  test("删除非默认成功", () => {
     const c = addProvider(base(), "b", { name: "B", baseURL: "x", apiKey: "k" });
     const r = removeProvider(c, "b");
     expect(r.provider!.b).toBeUndefined();
   });
-  test("删除激活中抛错", () => {
-    expect(() => removeProvider(base(), "a")).toThrow(/启用/);
+  test("删除默认供应商自动重定向 model 到剩余第一个", () => {
+    const c = addProvider(base(), "b", { name: "B", baseURL: "x", apiKey: "k", models: { m2: {} } });
+    // 默认是 a;先删 b(非默认),model 不动
+    const r1 = removeProvider(c, "b");
+    expect(r1.model).toBe("a/m1");
+    // 让 b 成为默认,删除 b 后 model 重定向到 a
+    const c2 = activateProvider(c, "b", "m2");
+    const r2 = removeProvider(c2, "b");
+    expect(r2.provider!.b).toBeUndefined();
+    expect(r2.model).toBe("a/m1");
+  });
+  test("删除唯一供应商后 model 清空", () => {
+    const r = removeProvider(base(), "a");
+    expect(r.provider!.a).toBeUndefined();
+    expect(r.model).toBeUndefined();
   });
 });
 
