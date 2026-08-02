@@ -158,8 +158,27 @@ const server = Bun.serve({
       }
     }
 
-    if (pathname === "/api/fetch-models") {
-      return fail(501, "尚未实现");
+    if (pathname === "/api/fetch-models" && method === "POST") {
+      try {
+        const body = await req.json() as { baseURL: string; apiKey: string };
+        if (!body.baseURL || !body.apiKey) return fail(400, "baseURL 和 apiKey 必填");
+        const endpoint = `${body.baseURL.replace(/\/+$/, "")}/models`;
+        const res = await fetch(endpoint, {
+          headers: { Authorization: `Bearer ${body.apiKey}` },
+          signal: AbortSignal.timeout(15000),
+        });
+        if (res.status === 401 || res.status === 403) return fail(401, "认证失败:请检查 API Key");
+        if (res.status === 404 || res.status === 405) return fail(404, "该供应商未提供 /models 端点");
+        if (!res.ok) return fail(502, `端点返回 ${res.status}`);
+        const data = await res.json() as { data?: { id: string }[] };
+        const models = (data.data ?? []).map((m) => m.id).filter(Boolean).sort();
+        if (models.length === 0) return fail(404, "端点未返回模型列表");
+        return ok({ models });
+      } catch (e) {
+        const msg = (e as Error).message;
+        if (msg.includes("timeout") || msg.includes("timed out")) return fail(408, "请求超时,请检查网络");
+        return fail(502, `请求失败: ${msg}`);
+      }
     }
 
     // 静态资源
