@@ -67,10 +67,13 @@ mimocode 配置格式(.mimocode/mimocode.jsonc,Windows 为 `%LOCALAPPDATA%\mimoc
 1. **自定义添加供应商**:表单字段 = 供应商标识(键名,小写+连字符校验)/ 名称 /
    API Key / Base URL / 模型列表(手动添加 + 自动获取)/ 可选:请求头、备注、官网链接。
    隐藏字段:`npm` 固定为 `@ai-sdk/openai-compatible`;`setCacheKey` 保持默认。
-2. **启用/切换**:点"启用" → 改顶层 `model` 指针为 `provider/model` → 原子写回。
+2. **设为默认**:点"设为默认" → 改顶层 `model` 指针为 `provider/model` → 原子写回。
+   mimocode 是 additive 模式:所有 provider 默认全部生效,`model` 只是启动默认,
+   用户可在 mimo 内手动切换供应商(与 codex 的单一激活语义不同)。
 3. **编辑**:修改已有供应商的任意字段,写回。
 4. **复制**:复制完整 provider 条目,新 key 加 `-copy` 后缀,插入原条目下方。
-5. **删除**:确认后删除;**禁止删除当前启用中的供应商**(最小侵入原则)。
+5. **删除**:确认后删除。删除默认供应商后,`model` 指针自动重定向到剩余第一个
+   供应商(无悬空);删除唯一供应商后 `model` 清空。
 6. **自动获取模型**:UI 点按钮 → Bun 服务端用该供应商的 apiKey 代理请求
    `/v1/models`(解决浏览器 CORS)→ 返回模型列表填入。
 7. **拖拽排序**:排序顺序存 `mimocode-ui.json`(mimocode.jsonc 的 provider 对象
@@ -83,11 +86,11 @@ mimocode 配置格式(.mimocode/mimocode.jsonc,Windows 为 `%LOCALAPPDATA%\mimoc
 
 | 方法 | 路径 | 说明 |
 |---|---|---|
-| GET | `/api/config` | 读 mimocode.jsonc + 元数据,返回 providers 列表、当前激活、路径信息 |
+| GET | `/api/config` | 读 mimocode.json(c) + 元数据,返回 providers 列表、当前默认 model、路径信息 |
 | POST | `/api/providers` | 新增供应商 |
 | PUT | `/api/providers/:id` | 更新供应商 |
-| DELETE | `/api/providers/:id` | 删除(校验非激活) |
-| POST | `/api/providers/:id/activate` | 切换激活(改 model 指针) |
+| DELETE | `/api/providers/:id` | 删除(默认供应商删除后自动重定向 model) |
+| POST | `/api/providers/:id/activate` | 设为默认(改 model 指针) |
 | POST | `/api/providers/:id/duplicate` | 复制 |
 | PUT | `/api/order` | 保存排序 |
 | POST | `/api/fetch-models` | 代理 `/v1/models`(请求体含 baseURL/apiKey) |
@@ -95,8 +98,10 @@ mimocode 配置格式(.mimocode/mimocode.jsonc,Windows 为 `%LOCALAPPDATA%\mimoc
 
 ### 5. 路径解析
 
-- `MIMOCODE_HOME` 环境变量优先;否则 Windows `%LOCALAPPDATA%\mimocode\mimocode.jsonc`;
-  macOS/Linux `~/.config/mimocode/mimocode.jsonc`。
+- 与 mimocode 源码 `resolveMimocodeHome` 一致:`MIMOCODE_HOME` 设置时 config 在
+  `$MIMOCODE_HOME/config` 子目录;否则用 XDG 默认 `~/.config/mimocode/`
+  (Windows 也如此,mimocode 不遵循 `%LOCALAPPDATA%`)。
+- 配置文件候选顺序:`mimocode.jsonc` > `mimocode.json` > `config.json`(取第一个存在者)。
 - 配置不存在 → UI 提示,提供"创建空模板"。
 - 解析失败 → 显示错误,拒绝任何写回(防止覆盖损坏配置)。
 
@@ -104,7 +109,7 @@ mimocode 配置格式(.mimocode/mimocode.jsonc,Windows 为 `%LOCALAPPDATA%\mimoc
 
 - JSONC 解析失败:拒绝写回,UI 显示错误。
 - 重复 provider id:拒绝添加,提示改名。
-- 删除激活中供应商:阻止。
+- 删除默认供应商:允许,前端提示"默认会自动切到其他供应商",后端自动重定向。
 - `/v1/models` 代理失败(401/404/超时):分类提示(借鉴 cc-switch 手册的错误分类)。
 
 ### 7. 测试
