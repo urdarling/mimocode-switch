@@ -3,6 +3,7 @@ const listEl = $("#list");
 const emptyEl = $("#empty");
 
 let state = { providers: [], activeModel: "", metadata: { order: [], notes: {}, links: {} } };
+let variantData = { builtin: {}, official: {} };
 
 async function api(path, options = {}) {
   const res = await fetch(path, {
@@ -18,6 +19,7 @@ async function refresh() {
   const data = await api("/api/config");
   state = data;
   $("#config-path").textContent = data.configFile;
+  fetch("/api/variants").then((r) => r.json()).then((d) => { if (d?.ok && d.data) variantData = d.data; }).catch(() => {});
   render();
 }
 
@@ -117,16 +119,44 @@ function syncDefaultModelUI() {
   if (checked && has && !sel.value) sel.selectedIndex = 0;
 }
 
+function variantHint(id) {
+  const b = variantData.builtin?.[id];
+  const o = variantData.official?.[id];
+  const bv = b?.variants?.length ? `内置: ${b.variants.join(", ")}` : "";
+  const ov = o?.variants?.length ? `官方: ${o.variants.join(", ")}` : "";
+  return [bv, ov].filter(Boolean).join(" | ") || "变体未知";
+}
+
+function prefillVariants(id) {
+  const o = variantData.official?.[id];
+  const b = variantData.builtin?.[id];
+  const list = o?.variants?.length ? o.variants : b?.variants ?? [];
+  return list.length ? Object.fromEntries(list.map((v) => [v, {}])) : null;
+}
+
 function renderModels() {
   modelsEl.innerHTML = "";
   Object.entries(models).forEach(([id, m]) => {
     const row = document.createElement("div");
     row.className = "model-row";
-    row.innerHTML = `<input value="${escapeHtml(id)}" disabled><span class="meta">${escapeHtml(m?.name ?? "")}</span>`;
+    const line1 = document.createElement("div");
+    line1.className = "model-row-line";
+    line1.innerHTML = `<input value="${escapeHtml(id)}" disabled><span class="meta">${escapeHtml(m?.name ?? "")}</span>`;
     const del = document.createElement("button");
     del.textContent = "×";
     del.onclick = () => { delete models[id]; renderModels(); };
-    row.appendChild(del);
+    line1.appendChild(del);
+    const line2 = document.createElement("div");
+    line2.className = "model-row-line";
+    line2.innerHTML = `<span class="meta variant-hint">${variantHint(id)}</span><input class="variant-input" value="${escapeHtml((Object.keys(m?.variants ?? {})).join(", "))}" placeholder="选用变体,逗号分隔(留空=不声明)">`;
+    const vinput = line2.querySelector(".variant-input");
+    vinput.addEventListener("change", () => {
+      const list = vinput.value.split(",").map((x) => x.trim()).filter(Boolean);
+      if (list.length > 0) models[id].variants = Object.fromEntries(list.map((v) => [v, {}]));
+      else delete models[id].variants;
+    });
+    row.appendChild(line1);
+    row.appendChild(line2);
     modelsEl.appendChild(row);
   });
   const sel = $("#f-default-model");
@@ -149,7 +179,7 @@ $("#f-default").addEventListener("change", syncDefaultModelUI);
 $("#btn-add-model").onclick = () => {
   const input = $("#f-model-new");
   const id = input.value.trim();
-  if (id && !models[id]) { models[id] = { name: id }; renderModels(); }
+  if (id && !models[id]) { models[id] = { name: id, ...(prefillVariants(id) ? { variants: prefillVariants(id) } : {}) }; renderModels(); }
   input.value = "";
 };
 
@@ -161,7 +191,7 @@ $("#btn-fetch-models").onclick = async () => {
       method: "POST",
       body: JSON.stringify({ baseURL: $("#f-baseURL").value, apiKey: $("#f-apiKey").value }),
     });
-    data.models.forEach((m) => { models[m] = models[m] ?? { name: m }; });
+    data.models.forEach((m) => { models[m] = models[m] ?? { name: m, ...(prefillVariants(m) ? { variants: prefillVariants(m) } : {}) }; });
     renderModels();
   } catch (e) {
     alert("获取模型失败: " + e.message);

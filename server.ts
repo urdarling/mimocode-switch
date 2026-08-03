@@ -65,9 +65,23 @@ const server = Bun.serve({
       }
     }
 
+    if (method === "GET" && pathname === "/api/variants") {
+      const read = (p: string): Record<string, unknown> => {
+        try {
+          return existsSync(p) ? JSON.parse(readFileSync(p, "utf8")) : {};
+        } catch {
+          return {};
+        }
+      };
+      return ok({
+        builtin: read(join(import.meta.dir, "data", "variants", "mimo.json")),
+        official: read(join(import.meta.dir, "data", "variants", "official.json")),
+      });
+    }
+
     if (method === "POST" && pathname === "/api/providers") {
       try {
-        const body = await req.json() as { id: string; name: string; baseURL: string; apiKey: string; headers?: Record<string, string>; models?: Record<string, { name?: string }>; note?: string; link?: string };
+        const body = await req.json() as { id: string; name: string; baseURL: string; apiKey: string; headers?: Record<string, string>; models?: Record<string, { name?: string; variants?: Record<string, unknown> }>; note?: string; link?: string };
         if (!body.id || !body.name || !body.baseURL || !body.apiKey) {
           return fail(400, "标识、名称、Base URL、API Key 均为必填");
         }
@@ -91,7 +105,7 @@ const server = Bun.serve({
 
     if (method === "PUT" && providerMatch) {
       try {
-        const body = await req.json() as { name: string; baseURL: string; apiKey: string; headers?: Record<string, string>; models?: Record<string, { name?: string }>; note?: string; link?: string };
+        const body = await req.json() as { name: string; baseURL: string; apiKey: string; headers?: Record<string, string>; models?: Record<string, { name?: string; variants?: Record<string, unknown> }>; note?: string; link?: string };
         const cfg = loadConfig() as never;
         const next = updateProvider(cfg, id, body);
         writeConfig(paths.configFile, next);

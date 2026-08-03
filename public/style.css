@@ -31,6 +31,9 @@ fieldset { border: 1px solid var(--border); border-radius: 8px; display: flex; f
 .row { display: flex; gap: 8px; }
 .row input { flex: 1; }
 .actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }
-.model-row { display: flex; gap: 8px; align-items: center; }
-.model-row input { flex: 1; }
+.model-row { display: flex; flex-direction: column; align-items: stretch; gap: 4px; }
+.model-row-line { display: flex; gap: 8px; align-items: center; }
+.model-row-line input { flex: 1; }
+.variant-hint { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.variant-input { font-size: 12px; }
 .model-row button { padding: 2px 8px; }

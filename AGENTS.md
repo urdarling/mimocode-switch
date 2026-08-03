@@ -13,6 +13,7 @@ mimocode 供应商管理工具 —— 带 UI 的 mimocode 第三方供应商管�
 - `server.ts`:单个 `Bun.serve` —— REST API + `public/` 静态文件,无框架
 - `lib/*.ts`:纯逻辑层,不依赖 Bun.serve,可独立单测;改逻辑优先改这里
 - `public/`:原生 HTML/CSS/JS,无框架无构建
+- `data/variants/`:`mimo.json` 由 `scripts/extract-mimo-catalog.ts` 生成(勿手改,mimo 升级后重跑 `bun run scripts/extract-mimo-catalog.ts`);`official.json` 手维护(模型变体库,维护说明见文件内 `//` 键)
 - `docs/compose/`:specs/plans/reports 是设计决策的权威来源(如 additive semantics 修订),改行为前先读
 
 ## 关键约束
