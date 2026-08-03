@@ -80,6 +80,27 @@ const server = Bun.serve({
       });
     }
 
+    if (method === "POST" && pathname === "/api/variants/extract") {
+      try {
+        const proc = Bun.spawn(["bun", "run", "scripts/extract-mimo-catalog.ts"], {
+          cwd: import.meta.dir,
+          stdout: "pipe",
+          stderr: "pipe",
+        });
+        const [code, outBuf, errBuf] = await Promise.all([
+          proc.exited,
+          new Response(proc.stdout).arrayBuffer(),
+          new Response(proc.stderr).arrayBuffer(),
+        ]);
+        const out = new TextDecoder().decode(outBuf);
+        const err = new TextDecoder().decode(errBuf);
+        if (code !== 0) return fail(500, (err || out).trim() || "提取失败");
+        return ok({ output: out.trim() });
+      } catch (e) {
+        return fail(500, (e as Error).message);
+      }
+    }
+
     if (method === "PUT" && pathname === "/api/variants/official") {
       try {
         const body = await req.json() as Record<string, unknown>;

@@ -230,7 +230,8 @@ fieldset legend { font-size: 12px; color: var(--muted); padding: 0 6px; }
 .vb-form label { margin-bottom: 8px; }
 .vb-form-actions { display: flex; justify-content: flex-end; gap: 8px; }
 .vb-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
-.vb-hint { color: var(--muted); font-size: 12px; }
+.vb-hint { color: var(--muted); font-size: 12px; flex: 1; min-width: 0; }
+.vb-ops { display: flex; gap: 6px; flex: 0 0 auto; }
 .vb-row {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr) auto;

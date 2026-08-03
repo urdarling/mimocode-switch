@@ -391,6 +391,24 @@ $("#vb-close").onclick = () => vbDialog.close();
 $("#vb-add").onclick = () => openVbForm();
 $("#vb-form-cancel").onclick = closeVbForm;
 
+$("#vb-extract").onclick = async () => {
+  const btn = $("#vb-extract");
+  btn.disabled = true;
+  const old = btn.textContent;
+  btn.textContent = "提取中...";
+  const hint = $("#vb-hint");
+  try {
+    const d = await api("/api/variants/extract", { method: "POST" });
+    hint.textContent = d.output.split("\n").pop() ?? "提取完成";
+    await vbRefresh();
+    await syncVariantData();
+  } catch (err) {
+    alert("提取失败: " + err.message);
+  }
+  btn.disabled = false;
+  btn.textContent = old;
+};
+
 $("#vb-form").addEventListener("submit", async (e) => {
   e.preventDefault();
   const id = $("#vb-id").value.trim();

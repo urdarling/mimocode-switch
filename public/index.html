@@ -73,8 +73,11 @@
         </form>
       </div>
       <div class="vb-toolbar">
-        <span class="vb-hint">手动维护,查官方文档确认支持哪些思考强度后录入</span>
-        <button id="vb-add" class="secondary">+ 新增条目</button>
+        <span class="vb-hint" id="vb-hint">手动维护,查官方文档确认支持哪些思考强度后录入</span>
+        <div class="vb-ops">
+          <button id="vb-extract" class="secondary" title="mimo 升级后点击,重新提取内置目录(mimo.json)">重新提取内置目录</button>
+          <button id="vb-add" class="secondary">+ 新增条目</button>
+        </div>
       </div>
       <div id="vb-list"></div>
     </div>
