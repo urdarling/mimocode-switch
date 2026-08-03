@@ -1,0 +1,5 @@
+# 测试临时目录(bun test 生成,自动清理)
+test/.tmp/
+
+# 本地 mimo 工作区(插件依赖与 dream/distill 临时文件)
+.mimocode/

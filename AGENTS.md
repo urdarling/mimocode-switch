@@ -6,6 +6,7 @@ mimocode 供应商管理工具 —— 带 UI 的 mimocode 第三方供应商管�
 
 - 启动:`bun server.ts`(默认端口 4173,`PORT` 环境变量可覆盖;Windows 用户可用 `start.bat`)
 - 测试:`bun test`(bun:test,测试文件在 `test/*.test.ts`,与 `lib/*.ts` 一一对应)
+- 测试临时文件一律放 `test/.tmp/`(已 gitignore),经 `test/helpers.ts` 的 `makeTestDir` 创建 —— 不要用系统临时目录
 - 无 tsconfig、无 lint/typecheck 脚本、无 node_modules —— 纯 Bun 直接跑 TS,没有构建步骤
 
 ## 架构
@@ -13,7 +14,7 @@ mimocode 供应商管理工具 —— 带 UI 的 mimocode 第三方供应商管�
 - `server.ts`:单个 `Bun.serve` —— REST API + `public/` 静态文件,无框架
 - `lib/*.ts`:纯逻辑层,不依赖 Bun.serve,可独立单测;改逻辑优先改这里
 - `public/`:原生 HTML/CSS/JS,无框架无构建
-- `data/variants/`:`mimo.json` 由 `scripts/extract-mimo-catalog.ts` 生成(勿手改,mimo 升级后重跑 `bun run scripts/extract-mimo-catalog.ts`);`official.json` 手维护(模型变体库,维护说明见文件内 `//` 键)
+- `data/variants/`:`mimo.json` 由 `scripts/extract-mimo-catalog.ts` 生成(勿手改,mimo 升级后重跑 `bun run scripts/extract-mimo-catalog.ts`);`official.json` 经 UI「变体库」界面维护(或手编辑,字段说明见文件内 `//` 键),写入走 `lib/variants-store.ts`(原子写,保留 `//` 键)
 - `docs/compose/`:specs/plans/reports 是设计决策的权威来源(如 additive semantics 修订),改行为前先读
 
 ## 关键约束
