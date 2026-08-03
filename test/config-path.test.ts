@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import { join } from "node:path";
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { resolveConfigPaths } from "../lib/config-path";
+import { makeTestDir, removeTestDir } from "./helpers";
 
 describe("resolveConfigPaths", () => {
   const oldHome = process.env.MIMOCODE_HOME;
@@ -21,7 +21,7 @@ describe("resolveConfigPaths", () => {
   });
 
   test("候选顺序:已存在 mimocode.json 时优先选择它", () => {
-    const root = mkdtempSync(join(tmpdir(), "mimo-pick-"));
+    const root = makeTestDir("mimo-pick-");
     const cfgDir = join(root, "config");
     mkdirSync(cfgDir);
     writeFileSync(join(cfgDir, "mimocode.json"), "{}");
@@ -29,12 +29,12 @@ describe("resolveConfigPaths", () => {
       const p = resolveConfigPaths({ MIMOCODE_HOME: root });
       expect(p.configFile).toBe(join(cfgDir, "mimocode.json"));
     } finally {
-      rmSync(root, { recursive: true, force: true });
+      removeTestDir(root);
     }
   });
 
   test("候选顺序:mimocode.jsonc 优先于 mimocode.json", () => {
-    const root = mkdtempSync(join(tmpdir(), "mimo-pick-"));
+    const root = makeTestDir("mimo-pick-");
     const cfgDir = join(root, "config");
     mkdirSync(cfgDir);
     writeFileSync(join(cfgDir, "mimocode.jsonc"), "{}");
@@ -43,12 +43,12 @@ describe("resolveConfigPaths", () => {
       const p = resolveConfigPaths({ MIMOCODE_HOME: root });
       expect(p.configFile).toBe(join(cfgDir, "mimocode.jsonc"));
     } finally {
-      rmSync(root, { recursive: true, force: true });
+      removeTestDir(root);
     }
   });
 
   test("候选顺序:config.json 兜底", () => {
-    const root = mkdtempSync(join(tmpdir(), "mimo-pick-"));
+    const root = makeTestDir("mimo-pick-");
     const cfgDir = join(root, "config");
     mkdirSync(cfgDir);
     writeFileSync(join(cfgDir, "config.json"), "{}");
@@ -56,7 +56,7 @@ describe("resolveConfigPaths", () => {
       const p = resolveConfigPaths({ MIMOCODE_HOME: root });
       expect(p.configFile).toBe(join(cfgDir, "config.json"));
     } finally {
-      rmSync(root, { recursive: true, force: true });
+      removeTestDir(root);
     }
   });
 

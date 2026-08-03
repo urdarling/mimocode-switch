@@ -1,13 +1,13 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
-import { mkdtempSync, readFileSync, rmSync, existsSync, readdirSync } from "node:fs";
+import { readFileSync, rmSync, existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
-import { tmpdir } from "node:os";
 import { readConfig, writeConfig } from "../lib/config-store";
+import { makeTestDir, removeTestDir } from "./helpers";
 
 let dir: string;
 
-beforeEach(() => { dir = mkdtempSync(join(tmpdir(), "mimo-store-")); });
-afterEach(() => { rmSync(dir, { recursive: true, force: true }); });
+beforeEach(() => { dir = makeTestDir("mimo-store-"); });
+afterEach(() => { removeTestDir(dir); });
 
 describe("readConfig", () => {
   test("文件不存在返回 null", () => {

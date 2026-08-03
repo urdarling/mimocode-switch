@@ -6,7 +6,7 @@ export interface ProviderInput {
   baseURL: string;
   apiKey: string;
   headers?: Record<string, string>;
-  models?: Record<string, { name?: string; variants?: Record<string, unknown> }>;
+  models?: Record<string, ModelSpec>;
 }
 
 export interface ProviderConfig {
@@ -14,7 +14,13 @@ export interface ProviderConfig {
   npm?: string;
   api?: string;
   options?: { baseURL?: string; apiKey?: string; headers?: Record<string, string> };
-  models?: Record<string, { name?: string; variants?: Record<string, unknown> }>;
+  models?: Record<string, ModelSpec>;
+}
+
+export interface ModelSpec {
+  name?: string;
+  variants?: Record<string, unknown>;
+  limit?: { context?: number; output?: number };
 }
 
 export interface ConfigData {

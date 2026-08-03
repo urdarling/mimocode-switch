@@ -25,6 +25,10 @@ describe("buildProvider", () => {
     const p = buildProvider({ name: "X", baseURL: "https://x.com", apiKey: "k", models: { m: { name: "M", variants: { low: {}, high: {} } } } });
     expect(p.models!.m.variants).toEqual({ low: {}, high: {} });
   });
+  test("models 透传 limit", () => {
+    const p = buildProvider({ name: "X", baseURL: "https://x.com", apiKey: "k", models: { m: { name: "M", limit: { context: 1050000, output: 128000 } } } });
+    expect(p.models!.m.limit).toEqual({ context: 1050000, output: 128000 });
+  });
 });
 
 describe("listProviders", () => {

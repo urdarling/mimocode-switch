@@ -7,6 +7,7 @@ import {
 import { readMetadata, writeMetadata } from "./lib/metadata";
 import { readConfig, writeConfig } from "./lib/config-store";
 import { resolveConfigPaths } from "./lib/config-path";
+import { readOfficialVariants, writeOfficialVariants } from "./lib/variants-store";
 
 const paths = resolveConfigPaths();
 const PORT = Number(process.env.PORT ?? 4173);
@@ -75,13 +76,36 @@ const server = Bun.serve({
       };
       return ok({
         builtin: read(join(import.meta.dir, "data", "variants", "mimo.json")),
-        official: read(join(import.meta.dir, "data", "variants", "official.json")),
+        official: readOfficialVariants(join(import.meta.dir, "data", "variants", "official.json")),
       });
+    }
+
+    if (method === "PUT" && pathname === "/api/variants/official") {
+      try {
+        const body = await req.json() as Record<string, unknown>;
+        if (typeof body !== "object" || body === null || Array.isArray(body)) {
+          return fail(400, "请求体必须是条目对象");
+        }
+        for (const [id, entry] of Object.entries(body)) {
+          if (id === "//") continue; // 说明键,非条目
+          if (typeof entry !== "object" || entry === null || Array.isArray(entry)) {
+            return fail(400, `条目 ${id} 必须是对象`);
+          }
+          const v = (entry as Record<string, unknown>).variants;
+          if (v !== undefined && (!Array.isArray(v) || v.some((x) => typeof x !== "string"))) {
+            return fail(400, `条目 ${id} 的 variants 必须是字符串数组`);
+          }
+        }
+        writeOfficialVariants(join(import.meta.dir, "data", "variants", "official.json"), body);
+        return ok({});
+      } catch (e) {
+        return fail(400, (e as Error).message);
+      }
     }
 
     if (method === "POST" && pathname === "/api/providers") {
       try {
-        const body = await req.json() as { id: string; name: string; baseURL: string; apiKey: string; headers?: Record<string, string>; models?: Record<string, { name?: string; variants?: Record<string, unknown> }>; note?: string; link?: string };
+        const body = await req.json() as { id: string; name: string; baseURL: string; apiKey: string; headers?: Record<string, string>; models?: Record<string, { name?: string; variants?: Record<string, unknown>; limit?: { context?: number; output?: number } }>; note?: string; link?: string };
         if (!body.id || !body.name || !body.baseURL || !body.apiKey) {
           return fail(400, "标识、名称、Base URL、API Key 均为必填");
         }
@@ -105,7 +129,7 @@ const server = Bun.serve({
 
     if (method === "PUT" && providerMatch) {
       try {
-        const body = await req.json() as { name: string; baseURL: string; apiKey: string; headers?: Record<string, string>; models?: Record<string, { name?: string; variants?: Record<string, unknown> }>; note?: string; link?: string };
+        const body = await req.json() as { name: string; baseURL: string; apiKey: string; headers?: Record<string, string>; models?: Record<string, { name?: string; variants?: Record<string, unknown>; limit?: { context?: number; output?: number } }>; note?: string; link?: string };
         const cfg = loadConfig() as never;
         const next = updateProvider(cfg, id, body);
         writeConfig(paths.configFile, next);
