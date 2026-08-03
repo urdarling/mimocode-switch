@@ -1,3 +1,5 @@
+[中文](README.md) | [English](README.en.md)
+
 # mimocode 供应商管理工具
 
 带 UI 的 mimocode 第三方供应商管理工具。供应商数据直接读写 mimocode.jsonc,
