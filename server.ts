@@ -116,6 +116,18 @@ const server = Bun.serve({
           if (v !== undefined && (!Array.isArray(v) || v.some((x) => typeof x !== "string"))) {
             return fail(400, `条目 ${id} 的 variants 必须是字符串数组`);
           }
+          const lim = (entry as Record<string, unknown>).limit;
+          if (lim !== undefined) {
+            if (typeof lim !== "object" || lim === null || Array.isArray(lim)) {
+              return fail(400, `条目 ${id} 的 limit 必须是对象`);
+            }
+            for (const k of ["context", "output"] as const) {
+              const val = (lim as Record<string, unknown>)[k];
+              if (val !== undefined && (typeof val !== "number" || !Number.isFinite(val) || val <= 0)) {
+                return fail(400, `条目 ${id} 的 limit.${k} 必须是正整数`);
+              }
+            }
+          }
         }
         writeOfficialVariants(join(import.meta.dir, "data", "variants", "official.json"), body);
         return ok({});
