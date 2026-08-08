@@ -2,6 +2,7 @@
 import { existsSync, readFileSync, mkdirSync, readdirSync, writeFileSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { homedir } from "node:os";
+import { extractCatalog } from "../lib/catalog-extract";
 
 function findExe(dir: string): string | null {
   if (!existsSync(dir)) return null;
@@ -50,71 +51,18 @@ function findBinary(): string {
 const bin = findBinary();
 console.log(`mimo 二进制: ${bin}`);
 const text = new TextDecoder("latin1").decode(readFileSync(bin));
-interface Snapshot {
-  reasoning: boolean;
-  variants: string[];
-  limit?: { context?: number; output?: number };
-}
-const out: Record<string, Snapshot> = {};
-
-const marker = "reasoning_options:[";
-let searchFrom = 0;
-let count = 0;
-while (true) {
-  const start = text.indexOf(marker, searchFrom);
-  if (start === -1) break;
-  searchFrom = start + marker.length;
-  // 括号配平,定位数组真正的结束 ]
-  let depth = 0;
-  let end = -1;
-  for (let i = start + marker.length - 1; i < text.length; i++) {
-    if (text[i] === "[") depth++;
-    else if (text[i] === "]") {
-      depth--;
-      if (depth === 0) {
-        end = i;
-        break;
-      }
-    }
-  }
-  if (end === -1) break;
-  const arrText = text.slice(start + marker.length - 1, end + 1);
-  const back = text.slice(Math.max(0, start - 8192), start);
-  const ids = [...back.matchAll(/id:"([^"]+)"/g)];
-  if (ids.length === 0) continue;
-  const modelId = ids[ids.length - 1][1].split("/").pop()!;
-  let values: string[] = [];
-  for (const item of arrText.matchAll(/\{type:"effort",values:\[([^\]]*)\]\}/g)) {
-    values = item[1].match(/"([^"]+)"/g)?.map((x) => x.slice(1, -1)) ?? [];
-  }
-  const hasToggle = /\{type:"toggle"\}/.test(arrText);
-  const reasoningFlag = [...back.matchAll(/reasoning:(!0|!1)/g)].pop()?.[1] === "!0";
-  const prev = out[modelId] ?? { reasoning: false, variants: [] as string[] };
-  prev.reasoning = prev.reasoning || hasToggle || values.length > 0 || reasoningFlag;
-  prev.variants = [...new Set([...prev.variants, ...values])];
-  // limit:目录条目可能带 input,取 context/output 的最大值作为默认
-  const limitRe = back.match(/limit:\{context:(\d+),input:(\d+),output:(\d+)\}/) ?? back.match(/limit:\{context:(\d+),output:(\d+)\}/);
-  if (limitRe) {
-    const ctx = Number(limitRe[1]);
-    const outN = Number(limitRe[limitRe.length - 1]);
-    if (ctx > 0 && outN > 0) {
-      prev.limit = {
-        context: Math.max(prev.limit?.context ?? 0, ctx),
-        output: Math.max(prev.limit?.output ?? 0, outN),
-      };
-    }
-  }
-  out[modelId] = prev;
-  count++;
-}
-if (count === 0) throw new Error("未提取到任何 reasoning_options,二进制结构可能已变化");
+const out = extractCatalog(text);
 
 const ds = out["deepseek-v4-flash"];
 if (!ds || !ds.variants.includes("high") || !ds.variants.includes("max")) {
   throw new Error("自检失败: deepseek-v4-flash 应含 high/max");
 }
+// limit 自检:官方 CONTEXT 1M / MAX OUTPUT 384K;向前错配的 2e6 应被本条目向后提取替换
+if (!ds.limit || ds.limit.context! < 1000000 || ds.limit.context! > 2000000) {
+  throw new Error(`自检失败: deepseek-v4-flash limit 异常: ${JSON.stringify(ds.limit)}`);
+}
 
 const outPath = join(import.meta.dir, "..", "data", "variants", "mimo.json");
 mkdirSync(dirname(outPath), { recursive: true });
 writeFileSync(outPath, JSON.stringify(out, null, 2) + "\n");
-console.log(`已提取 ${count} 条 reasoning_options → ${outPath}(${Object.keys(out).length} 个模型);该文件由脚本生成,勿手改`);
+console.log(`已提取 → ${outPath}(${Object.keys(out).length} 个模型);该文件由脚本生成,勿手改`);
