@@ -1,5 +1,10 @@
 # 官方库扩展 limit 字段:为无内置模型提供上下文/输出预填 — Design Spec
 
+> [!NOTE]
+> This document may not reflect the current implementation.
+> See the final report for up-to-date state:
+> [Final Report](../reports/official-limit.md)
+
 ## [S1] Problem
 
 模型的上下文窗口(context)与单次输出上限(output)对 mimocode 的上下文管理至关重要。内置快照 `data/variants/mimo.json` 已含 `limit`(1224/1238 模型有),但**没有内置的模型**(第三方供应商自定义/中转站模型)获取模型列表后这两个参数为空,用户须手查官方文档填写,且无法复用已有录入。

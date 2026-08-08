@@ -1,5 +1,10 @@
 # 官方库扩展 limit 字段 Implementation Plan
 
+> [!NOTE]
+> This document may not reflect the current implementation.
+> See the final report for up-to-date state:
+> [Final Report](../reports/official-limit.md)
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use compose:subagent (recommended) or compose:execute to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** 官方库 `official.json` 条目支持可选 `limit {context, output}` 字段,UI 获取模型列表后按「已存 ?? 官方 ?? 内置」优先级预填,变体库管理对话框可编辑 limit。
