@@ -50,8 +50,6 @@ export function extractCatalog(text: string): Record<string, CatalogSnapshot> {
     prev.reasoning = prev.reasoning || hasToggle || values.length > 0 || reasoningFlag;
     prev.variants = [...new Set([...prev.variants, ...values])];
     // limit 在 reasoning_options 数组之后、该条目结束 } 之前;向后扫描本条目自己的 limit,
-    // 不向前回看(向前会误配到前一条目)。取到条目结束 } 为止。
-    // limit 在 reasoning_options 数组之后、该条目结束 } 之前;向后扫描本条目自己的 limit,
     // 不向前回看(向前会误配到前一条目)。条目结束 = 下一个 }," (对象闭合 + 逗号 + 下一条目键引号),
     // 嵌套对象(如 interleaved:{...})的 } 后跟字段名而非引号,可正确跳过。
     const afterEnd = text.slice(end + 1, Math.min(text.length, end + 1 + 4096));
