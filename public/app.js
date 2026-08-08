@@ -250,8 +250,9 @@ function renderModels() {
     row.className = "model-row";
     const col1 = document.createElement("div");
     const bl = variantData.builtin?.[id]?.limit;
-    const ctx = m?.limit?.context ?? bl?.context ?? "";
-    const out = m?.limit?.output ?? bl?.output ?? "";
+    const ol = variantData.official?.[id]?.limit;
+    const ctx = m?.limit?.context ?? ol?.context ?? bl?.context ?? "";
+    const out = m?.limit?.output ?? ol?.output ?? bl?.output ?? "";
     col1.innerHTML = `
       <div class="m-id" title="${escapeHtml(id)}">${escapeHtml(id)}</div>
       <div class="m-name" title="${escapeHtml(m?.name ?? "")}">${escapeHtml(m?.name ?? "")}</div>
