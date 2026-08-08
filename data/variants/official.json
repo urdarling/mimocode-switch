@@ -32,6 +32,24 @@
       "max"
     ],
     "source": "",
-    "updated": "2026-08-03"
+    "updated": "2026-08-08",
+    "limit": {
+      "context": 1000000,
+      "output": 384000
+    }
+  },
+  "qwen3.8-max": {
+    "name": "qwen",
+    "variants": [
+      "low",
+      "medium",
+      "xhigh"
+    ],
+    "source": "https://docs.qwen.ai/",
+    "updated": "2026-08-08",
+    "limit": {
+      "context": 1000000,
+      "output": 131072
+    }
   }
 }
