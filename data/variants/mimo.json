@@ -10,8 +10,8 @@
       "xhigh"
     ],
     "limit": {
-      "context": 205000,
-      "output": 202752
+      "context": 204800,
+      "output": 131072
     }
   },
   "glm-5.1": {
@@ -24,8 +24,8 @@
       "xhigh"
     ],
     "limit": {
-      "context": 204800,
-      "output": 202752
+      "context": 200000,
+      "output": 131072
     }
   },
   "glm-5.2": {
@@ -40,8 +40,8 @@
       "minimal"
     ],
     "limit": {
-      "context": 1048576,
-      "output": 1048560
+      "context": 1000000,
+      "output": 131072
     }
   },
   "glm-5v-turbo": {
@@ -51,7 +51,7 @@
       "xhigh"
     ],
     "limit": {
-      "context": 202752,
+      "context": 200000,
       "output": 131072
     }
   },
@@ -70,8 +70,8 @@
       "xhigh"
     ],
     "limit": {
-      "context": 205000,
-      "output": 202752
+      "context": 204800,
+      "output": 131072
     }
   },
   "glm-4.5v": {
@@ -81,8 +81,8 @@
       "xhigh"
     ],
     "limit": {
-      "context": 128000,
-      "output": 96000
+      "context": 65536,
+      "output": 16384
     }
   },
   "glm-4.5": {
@@ -93,7 +93,7 @@
     ],
     "limit": {
       "context": 131072,
-      "output": 131072
+      "output": 98304
     }
   },
   "glm-4.6": {
@@ -104,7 +104,7 @@
     ],
     "limit": {
       "context": 204800,
-      "output": 204800
+      "output": 131072
     }
   },
   "glm-4.7-flashx": {
@@ -124,8 +124,8 @@
       "xhigh"
     ],
     "limit": {
-      "context": 203000,
-      "output": 203000
+      "context": 200000,
+      "output": 131072
     }
   },
   "glm-4.5-air": {
@@ -136,7 +136,7 @@
     ],
     "limit": {
       "context": 131072,
-      "output": 131072
+      "output": 98304
     }
   },
   "glm-4.6v": {
@@ -146,8 +146,8 @@
       "xhigh"
     ],
     "limit": {
-      "context": 200000,
-      "output": 131072
+      "context": 128000,
+      "output": 32768
     }
   },
   "lucidquery-agi-01-frontier": {
@@ -194,7 +194,7 @@
       "max"
     ],
     "limit": {
-      "context": 1065535,
+      "context": 1048576,
       "output": 65536
     }
   },
@@ -210,7 +210,7 @@
       "xhigh"
     ],
     "limit": {
-      "context": 1048756,
+      "context": 1048576,
       "output": 65536
     }
   },
@@ -226,7 +226,7 @@
       "none"
     ],
     "limit": {
-      "context": 1065535,
+      "context": 1048576,
       "output": 65536
     }
   },
@@ -253,7 +253,7 @@
       "none"
     ],
     "limit": {
-      "context": 1048756,
+      "context": 1048576,
       "output": 65536
     }
   },
@@ -267,7 +267,7 @@
     ],
     "limit": {
       "context": 1000000,
-      "output": 1000000
+      "output": 30000
     }
   },
   "deepseek-v4-flash": {
@@ -282,8 +282,8 @@
       "minimal"
     ],
     "limit": {
-      "context": 1050000,
-      "output": 1048576
+      "context": 1000000,
+      "output": 384000
     }
   },
   "deepseek-v4-pro": {
@@ -297,16 +297,16 @@
       "medium"
     ],
     "limit": {
-      "context": 1050000,
-      "output": 1048576
+      "context": 1000000,
+      "output": 384000
     }
   },
   "deepseek-r1": {
     "reasoning": true,
     "variants": [],
     "limit": {
-      "context": 1000000,
-      "output": 384000
+      "context": 163840,
+      "output": 163840
     }
   },
   "claude-sonnet-4-6": {
@@ -321,7 +321,7 @@
     ],
     "limit": {
       "context": 1000000,
-      "output": 128000
+      "output": 64000
     }
   },
   "claude-haiku-4-5": {
@@ -336,7 +336,7 @@
     ],
     "limit": {
       "context": 200000,
-      "output": 200000
+      "output": 64000
     }
   },
   "claude-opus-4-6": {
@@ -365,7 +365,7 @@
       "none"
     ],
     "limit": {
-      "context": 1000000,
+      "context": 200000,
       "output": 64000
     }
   },
@@ -393,7 +393,7 @@
     ],
     "limit": {
       "context": 128000,
-      "output": 128000
+      "output": 4096
     }
   },
   "o3-mini": {
@@ -524,7 +524,7 @@
     ],
     "limit": {
       "context": 262144,
-      "output": 262144
+      "output": 65536
     }
   },
   "Qwen3.6-35B-A3B-FP8": {
@@ -626,7 +626,7 @@
     ],
     "limit": {
       "context": 131072,
-      "output": 131072
+      "output": 32768
     }
   },
   "minimax-m2p7": {
@@ -661,8 +661,8 @@
       "max"
     ],
     "limit": {
-      "context": 1048576,
-      "output": 1048576
+      "context": 512000,
+      "output": 128000
     }
   },
   "glm-5p1": {
@@ -691,7 +691,7 @@
     ],
     "limit": {
       "context": 131072,
-      "output": 131072
+      "output": 32768
     }
   },
   "glm-5p2": {
@@ -714,7 +714,7 @@
     ],
     "limit": {
       "context": 1000000,
-      "output": 262144
+      "output": 32000
     }
   },
   "NVIDIA-Nemotron-3-Ultra-550B-A55B": {
@@ -734,7 +734,7 @@
     ],
     "limit": {
       "context": 262144,
-      "output": 262144
+      "output": 32768
     }
   },
   "GLM-5.2": {
@@ -748,8 +748,8 @@
       "xhigh"
     ],
     "limit": {
-      "context": 1049000,
-      "output": 524288
+      "context": 1048576,
+      "output": 131072
     }
   },
   "GLM-5.1": {
@@ -760,8 +760,8 @@
       "high"
     ],
     "limit": {
-      "context": 205000,
-      "output": 205000
+      "context": 202752,
+      "output": 131072
     }
   },
   "Qwen3.5-27B": {
@@ -769,7 +769,7 @@
     "variants": [],
     "limit": {
       "context": 262144,
-      "output": 262144
+      "output": 65536
     }
   },
   "Qwen3.5-35B-A3B": {
@@ -777,7 +777,7 @@
     "variants": [],
     "limit": {
       "context": 262144,
-      "output": 262144
+      "output": 65536
     }
   },
   "Qwen3.6-35B-A3B": {
@@ -797,7 +797,7 @@
     "variants": [],
     "limit": {
       "context": 262144,
-      "output": 262144
+      "output": 131072
     }
   },
   "MiniMax-M2.5": {
@@ -809,7 +809,7 @@
     ],
     "limit": {
       "context": 204800,
-      "output": 204000
+      "output": 131072
     }
   },
   "MiniMax-M3": {
@@ -822,8 +822,8 @@
       "max"
     ],
     "limit": {
-      "context": 1048576,
-      "output": 1048576
+      "context": 1000000,
+      "output": 128000
     }
   },
   "DeepSeek-V4-Flash": {
@@ -835,8 +835,8 @@
       "xhigh"
     ],
     "limit": {
-      "context": 1048576,
-      "output": 1048576
+      "context": 1000000,
+      "output": 384000
     }
   },
   "DeepSeek-V4-Pro": {
@@ -849,8 +849,8 @@
       "max"
     ],
     "limit": {
-      "context": 1049000,
-      "output": 1048576
+      "context": 1000000,
+      "output": 384000
     }
   },
   "Kimi-K2.6": {
@@ -910,7 +910,7 @@
       "max"
     ],
     "limit": {
-      "context": 1048756,
+      "context": 1048576,
       "output": 65536
     }
   },
@@ -925,7 +925,7 @@
     ],
     "limit": {
       "context": 1000000,
-      "output": 65536
+      "output": 64000
     }
   },
   "qwen3.7-max": {
@@ -1023,7 +1023,7 @@
     ],
     "limit": {
       "context": 1048576,
-      "output": 1048576
+      "output": 131072
     }
   },
   "minimax-m2.7": {
@@ -1037,7 +1037,7 @@
     ],
     "limit": {
       "context": 204800,
-      "output": 196608
+      "output": 131072
     }
   },
   "grok-4.5": {
@@ -1049,8 +1049,8 @@
       "none"
     ],
     "limit": {
-      "context": 1000000,
-      "output": 1000000
+      "context": 500000,
+      "output": 500000
     }
   },
   "grok-build-0.1": {
@@ -1075,8 +1075,8 @@
       "xhigh"
     ],
     "limit": {
-      "context": 1050000,
-      "output": 131100
+      "context": 1048576,
+      "output": 131072
     }
   },
   "mimo-v2.5-pro": {
@@ -1089,7 +1089,7 @@
       "xhigh"
     ],
     "limit": {
-      "context": 1050000,
+      "context": 1048576,
       "output": 131072
     }
   },
@@ -1132,7 +1132,7 @@
     ],
     "limit": {
       "context": 1000000,
-      "output": 1000000
+      "output": 128000
     }
   },
   "glm-5-turbo": {
@@ -1142,8 +1142,8 @@
       "xhigh"
     ],
     "limit": {
-      "context": 202800,
-      "output": 131100
+      "context": 200000,
+      "output": 131072
     }
   },
   "gpt-5.5-pro": {
@@ -1201,7 +1201,7 @@
       "minimal"
     ],
     "limit": {
-      "context": 1047576,
+      "context": 400000,
       "output": 128000
     }
   },
@@ -1476,8 +1476,8 @@
     "reasoning": true,
     "variants": [],
     "limit": {
-      "context": 265000,
-      "output": 265000
+      "context": 262144,
+      "output": 65536
     }
   },
   "mimo-v2-pro": {
@@ -1485,7 +1485,7 @@
     "variants": [],
     "limit": {
       "context": 1048576,
-      "output": 256000
+      "output": 131072
     }
   },
   "minimax-m2.5": {
@@ -1496,8 +1496,8 @@
       "high"
     ],
     "limit": {
-      "context": 228700,
-      "output": 196608
+      "context": 204800,
+      "output": 131072
     }
   },
   "gemini-3-flash": {
@@ -1568,7 +1568,7 @@
     "variants": [],
     "limit": {
       "context": 256000,
-      "output": 128000
+      "output": 64000
     }
   },
   "grok-4.1-fast-reasoning": {
@@ -1584,7 +1584,7 @@
     "variants": [],
     "limit": {
       "context": 2000000,
-      "output": 2000000
+      "output": 30000
     }
   },
   "grok-code-fast-1": {
@@ -1618,7 +1618,7 @@
     ],
     "limit": {
       "context": 1000000,
-      "output": 128000
+      "output": 64000
     }
   },
   "claude-opus-4.1": {
@@ -1632,7 +1632,7 @@
     ],
     "limit": {
       "context": 200000,
-      "output": 64000
+      "output": 32000
     }
   },
   "claude-opus-4.5": {
@@ -1660,7 +1660,7 @@
       "max"
     ],
     "limit": {
-      "context": 1048576,
+      "context": 1000000,
       "output": 128000
     }
   },
@@ -1687,7 +1687,7 @@
       "max"
     ],
     "limit": {
-      "context": 1000000,
+      "context": 200000,
       "output": 64000
     }
   },
@@ -1739,7 +1739,7 @@
       "max"
     ],
     "limit": {
-      "context": 1048576,
+      "context": 1000000,
       "output": 128000
     }
   },
@@ -2022,7 +2022,7 @@
     ],
     "limit": {
       "context": 163840,
-      "output": 163840
+      "output": 65536
     }
   },
   "kimi-k2-thinking": {
@@ -2037,8 +2037,8 @@
     "reasoning": true,
     "variants": [],
     "limit": {
-      "context": 205000,
-      "output": 196000
+      "context": 204800,
+      "output": 131072
     }
   },
   "glm-4.7-n": {
@@ -2077,8 +2077,8 @@
     "reasoning": true,
     "variants": [],
     "limit": {
-      "context": 205000,
-      "output": 205000
+      "context": 202752,
+      "output": 131072
     }
   },
   "GLM-4.7": {
@@ -2086,7 +2086,7 @@
     "variants": [],
     "limit": {
       "context": 204800,
-      "output": 200000
+      "output": 131072
     }
   },
   "DeepSeek-V3.1": {
@@ -2115,7 +2115,7 @@
       "max"
     ],
     "limit": {
-      "context": 1000000,
+      "context": 262144,
       "output": 262144
     }
   },
@@ -2151,7 +2151,7 @@
     ],
     "limit": {
       "context": 1000000,
-      "output": 512300
+      "output": 128000
     }
   },
   "gemma-4-31b-it": {
@@ -2164,7 +2164,7 @@
     ],
     "limit": {
       "context": 262144,
-      "output": 262144
+      "output": 32768
     }
   },
   "qwen3.5-397b-a17b": {
@@ -2177,7 +2177,7 @@
     ],
     "limit": {
       "context": 262144,
-      "output": 262144
+      "output": 65536
     }
   },
   "qwen3.5-122b-a10b": {
@@ -2185,7 +2185,7 @@
     "variants": [],
     "limit": {
       "context": 262144,
-      "output": 262144
+      "output": 65536
     }
   },
   "mistral-small-4-119b-2603": {
@@ -2207,8 +2207,8 @@
       "high"
     ],
     "limit": {
-      "context": 262144,
-      "output": 262114
+      "context": 256000,
+      "output": 256000
     }
   },
   "step-3.7-flash": {
@@ -2222,8 +2222,8 @@
       "max"
     ],
     "limit": {
-      "context": 262144,
-      "output": 262144
+      "context": 256000,
+      "output": 256000
     }
   },
   "Nemotron-3-Nano-Omni": {
@@ -2260,7 +2260,7 @@
     ],
     "limit": {
       "context": 262144,
-      "output": 130000
+      "output": 65536
     }
   },
   "Qwen3-Next-80B-A3B-Thinking": {
@@ -2299,7 +2299,7 @@
     "reasoning": true,
     "variants": [],
     "limit": {
-      "context": 400000,
+      "context": 164000,
       "output": 164000
     }
   },
@@ -2401,7 +2401,7 @@
     "variants": [],
     "limit": {
       "context": 1000000,
-      "output": 65536
+      "output": 57920
     }
   },
   "deep-research-max-preview-04-2026": {
@@ -2421,7 +2421,7 @@
       "xhigh"
     ],
     "limit": {
-      "context": 131072,
+      "context": 65536,
       "output": 32768
     }
   },
@@ -2434,7 +2434,7 @@
       "xhigh"
     ],
     "limit": {
-      "context": 1048756,
+      "context": 1048576,
       "output": 65536
     }
   },
@@ -2446,7 +2446,7 @@
     ],
     "limit": {
       "context": 65536,
-      "output": 66000
+      "output": 4096
     }
   },
   "gemini-3.1-flash-image-preview": {
@@ -2459,7 +2459,7 @@
       "xhigh"
     ],
     "limit": {
-      "context": 1048576,
+      "context": 65536,
       "output": 65536
     }
   },
@@ -2481,7 +2481,7 @@
     ],
     "limit": {
       "context": 262144,
-      "output": 262144
+      "output": 32768
     }
   },
   "gemini-3.6-flash": {
@@ -2523,7 +2523,7 @@
       "high"
     ],
     "limit": {
-      "context": 131072,
+      "context": 65536,
       "output": 32768
     }
   },
@@ -2872,8 +2872,8 @@
     "reasoning": true,
     "variants": [],
     "limit": {
-      "context": 204800,
-      "output": 131072
+      "context": 196608,
+      "output": 128000
     }
   },
   "Qwen3.5-27B-Musica-v1": {
@@ -3147,8 +3147,8 @@
       "high"
     ],
     "limit": {
-      "context": 1048756,
-      "output": 65536
+      "context": 1048576,
+      "output": 65535
     }
   },
   "claude-opus-4-1-thinking:8192": {
@@ -3209,7 +3209,7 @@
     ],
     "limit": {
       "context": 1048756,
-      "output": 200000
+      "output": 65536
     }
   },
   "Qwen3.5-27B-Writer-Derestricted-Lite": {
@@ -3229,7 +3229,7 @@
       "high"
     ],
     "limit": {
-      "context": 1048756,
+      "context": 1048576,
       "output": 65536
     }
   },
@@ -3383,7 +3383,7 @@
     ],
     "limit": {
       "context": 128000,
-      "output": 128000
+      "output": 50000
     }
   },
   "gemini-2.5-pro-preview-03-25": {
@@ -3541,7 +3541,7 @@
       "high"
     ],
     "limit": {
-      "context": 1048756,
+      "context": 1048576,
       "output": 65536
     }
   },
@@ -3808,7 +3808,7 @@
     "reasoning": true,
     "variants": [],
     "limit": {
-      "context": 128000,
+      "context": 65536,
       "output": 65536
     }
   },
@@ -3822,7 +3822,7 @@
     ],
     "limit": {
       "context": 262144,
-      "output": 256000
+      "output": 131072
     }
   },
   "mistral-medium-3.5:thinking": {
@@ -3899,8 +3899,8 @@
     "reasoning": true,
     "variants": [],
     "limit": {
-      "context": 163840,
-      "output": 163840
+      "context": 128000,
+      "output": 128000
     }
   },
   "deepseek-v4-pro-cheaper": {
@@ -3984,7 +3984,7 @@
     "variants": [],
     "limit": {
       "context": 163840,
-      "output": 163840
+      "output": 64000
     }
   },
   "deepseek-v3.2-exp-thinking": {
@@ -4000,7 +4000,7 @@
     "variants": [],
     "limit": {
       "context": 262144,
-      "output": 256000
+      "output": 65536
     }
   },
   "mimo-v2-flash-thinking": {
@@ -4271,7 +4271,7 @@
     "variants": [],
     "limit": {
       "context": 262144,
-      "output": 262144
+      "output": 80000
     }
   },
   "step-3.7-flash:thinking": {
@@ -4287,7 +4287,7 @@
     "variants": [],
     "limit": {
       "context": 204800,
-      "output": 131100
+      "output": 131072
     }
   },
   "deepseek-r1-distill-llama-70b": {
@@ -4300,8 +4300,8 @@
       "max"
     ],
     "limit": {
-      "context": 131072,
-      "output": 131072
+      "context": 8192,
+      "output": 8192
     }
   },
   "GLM-5.1-FP8": {
@@ -4312,7 +4312,7 @@
     ],
     "limit": {
       "context": 202752,
-      "output": 202752
+      "output": 131072
     }
   },
   "Qwen3.5-122B-A10B": {
@@ -4415,7 +4415,7 @@
     ],
     "limit": {
       "context": 131072,
-      "output": 40960
+      "output": 16384
     }
   },
   "seed-1-8-251228": {
@@ -4454,8 +4454,8 @@
       "high"
     ],
     "limit": {
-      "context": 400000,
-      "output": 262144
+      "context": 262144,
+      "output": 65536
     }
   },
   "fugu-ultra": {
@@ -4501,8 +4501,8 @@
     "reasoning": true,
     "variants": [],
     "limit": {
-      "context": 262144,
-      "output": 128000
+      "context": 131072,
+      "output": 32768
     }
   },
   "gpt-5.2-chat-latest": {
@@ -4511,8 +4511,8 @@
       "medium"
     ],
     "limit": {
-      "context": 400000,
-      "output": 128000
+      "context": 128000,
+      "output": 16384
     }
   },
   "kimi-k2.7-code-highspeed": {
@@ -4600,7 +4600,7 @@
     "variants": [],
     "limit": {
       "context": 204800,
-      "output": 131100
+      "output": 131072
     }
   },
   "grok-4-1-fast-reasoning": {
@@ -4612,7 +4612,7 @@
     ],
     "limit": {
       "context": 2000000,
-      "output": 2000000
+      "output": 30000
     }
   },
   "qwen3-235b-a22b-fp8": {
@@ -4641,7 +4641,7 @@
       "max"
     ],
     "limit": {
-      "context": 1000000,
+      "context": 200000,
       "output": 64000
     }
   },
@@ -4673,8 +4673,8 @@
     "reasoning": true,
     "variants": [],
     "limit": {
-      "context": 400000,
-      "output": 400000
+      "context": 204800,
+      "output": 131072
     }
   },
   "hermes-4-405b": {
@@ -4752,7 +4752,7 @@
     "variants": [],
     "limit": {
       "context": 262144,
-      "output": 256000
+      "output": 65536
     }
   },
   "nemotron-3-super-120b": {
@@ -4989,7 +4989,7 @@
     ],
     "limit": {
       "context": 202000,
-      "output": 131072
+      "output": 128000
     }
   },
   "gemini-2-5-flash": {
@@ -5097,7 +5097,7 @@
     "variants": [],
     "limit": {
       "context": 262144,
-      "output": 256000
+      "output": 32768
     }
   },
   "laguna-s-2.1-free": {
@@ -5405,7 +5405,7 @@
     "variants": [],
     "limit": {
       "context": 40960,
-      "output": 32768
+      "output": 20000
     }
   },
   "qwq-32b": {
@@ -5413,7 +5413,7 @@
     "variants": [],
     "limit": {
       "context": 131072,
-      "output": 24000
+      "output": 8192
     }
   },
   "deepseek-r1-distill-qwen-32b": {
@@ -5444,7 +5444,7 @@
     "reasoning": true,
     "variants": [],
     "limit": {
-      "context": 204800,
+      "context": 202752,
       "output": 131072
     }
   },
@@ -5611,8 +5611,8 @@
       "medium"
     ],
     "limit": {
-      "context": 400000,
-      "output": 128000
+      "context": 128000,
+      "output": 16384
     }
   },
   "sonar-deep-research": {
@@ -5625,7 +5625,7 @@
     ],
     "limit": {
       "context": 128000,
-      "output": 128000
+      "output": 32768
     }
   },
   "claude-4.5-opus": {
@@ -5657,7 +5657,7 @@
     "variants": [],
     "limit": {
       "context": 163840,
-      "output": 65536
+      "output": 32768
     }
   },
   "sonar-reasoning": {
@@ -5845,7 +5845,7 @@
     ],
     "limit": {
       "context": 1000000,
-      "output": 202752
+      "output": 131072
     }
   },
   "large": {
@@ -6469,8 +6469,8 @@
       "xhigh"
     ],
     "limit": {
-      "context": 131072,
-      "output": 131072
+      "context": 131000,
+      "output": 131000
     }
   },
   "Qwen3-1.7B-Base": {
@@ -6495,7 +6495,7 @@
     ],
     "limit": {
       "context": 131072,
-      "output": 131000
+      "output": 16384
     }
   },
   "Qwen3-4B-Instruct-2507": {
@@ -6617,7 +6617,7 @@
       "xhigh"
     ],
     "limit": {
-      "context": 1050000,
+      "context": 1048576,
       "output": 131072
     }
   },
@@ -6719,7 +6719,7 @@
     "reasoning": true,
     "variants": [],
     "limit": {
-      "context": 262144,
+      "context": 262000,
       "output": 262000
     }
   },
@@ -6844,7 +6844,7 @@
     "variants": [],
     "limit": {
       "context": 2000000,
-      "output": 2000000
+      "output": 64000
     }
   },
   "claude-3.7-sonnet": {
@@ -7027,7 +7027,7 @@
     "reasoning": true,
     "variants": [],
     "limit": {
-      "context": 163840,
+      "context": 131072,
       "output": 131072
     }
   },
@@ -7314,8 +7314,8 @@
       "high"
     ],
     "limit": {
-      "context": 400000,
-      "output": 128000
+      "context": 128000,
+      "output": 16384
     }
   },
   "o1-mini": {
@@ -7368,8 +7368,8 @@
     "reasoning": true,
     "variants": [],
     "limit": {
-      "context": 164000,
-      "output": 164000
+      "context": 163840,
+      "output": 32768
     }
   },
   "gpt-5.1-chat": {
@@ -7390,7 +7390,7 @@
     "reasoning": true,
     "variants": [],
     "limit": {
-      "context": 128000,
+      "context": 32000,
       "output": 4096
     }
   },
@@ -7404,8 +7404,8 @@
       "max"
     ],
     "limit": {
-      "context": 400000,
-      "output": 128000
+      "context": 128000,
+      "output": 16384
     }
   },
   "codex-mini": {
@@ -8231,7 +8231,7 @@
     "variants": [],
     "limit": {
       "context": 262144,
-      "output": 262144
+      "output": 65536
     }
   },
   "qwen3.5-35b-a3b": {
@@ -8239,7 +8239,7 @@
     "variants": [],
     "limit": {
       "context": 262144,
-      "output": 262144
+      "output": 65536
     }
   },
   "mistral-medium-3.5-128b": {
@@ -8266,7 +8266,7 @@
     "variants": [],
     "limit": {
       "context": 260000,
-      "output": 131000
+      "output": 16384
     }
   },
   "cogito-v2-1-671b": {
@@ -9516,7 +9516,7 @@
     "variants": [],
     "limit": {
       "context": 202752,
-      "output": 128000
+      "output": 16384
     }
   },
   "GLM-5-FP8": {
@@ -10569,7 +10569,7 @@
     "variants": [],
     "limit": {
       "context": 131072,
-      "output": 40960
+      "output": 8192
     }
   },
   "qwen3-vl-30b-a3b-thinking": {
@@ -10593,7 +10593,7 @@
     "variants": [],
     "limit": {
       "context": 131072,
-      "output": 40960
+      "output": 8192
     }
   },
   "qwen3-235b-a22b": {
@@ -10625,7 +10625,7 @@
     "variants": [],
     "limit": {
       "context": 126000,
-      "output": 32768
+      "output": 32000
     }
   },
   "qwen3-vl-8b-thinking": {
@@ -10641,7 +10641,7 @@
     "variants": [],
     "limit": {
       "context": 262144,
-      "output": 65536
+      "output": 32768
     }
   },
   "qwen3.5-plus-20260420": {
@@ -11843,7 +11843,7 @@
     "variants": [],
     "limit": {
       "context": 262144,
-      "output": 256000
+      "output": 4096
     }
   },
   "Qwen3.5-4B": {

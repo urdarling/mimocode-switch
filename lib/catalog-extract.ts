@@ -13,8 +13,29 @@ function parseLimitNumber(raw: string): number {
   return Number.isFinite(n) ? n : 0;
 }
 
+// 取众数:同一模型跨供应商条目的 limit 各自投票,取出现次数最多者;
+// 平票取 context/output 更大者(聚合商条目通常声明更大,但官方/多数派条目应胜出)。
+function pickModeLimit(
+  votes: { context: number; output: number }[],
+): { context: number; output: number } | undefined {
+  if (votes.length === 0) return undefined;
+  const counts = new Map<string, number>();
+  for (const v of votes) {
+    const k = `${v.context}:${v.output}`;
+    counts.set(k, (counts.get(k) ?? 0) + 1);
+  }
+  return [...counts.entries()]
+    .map(([k, c]) => {
+      const [ctx, outN] = k.split(":").map(Number);
+      return { context: ctx, output: outN, count: c };
+    })
+    .sort((a, b) => b.count - a.count || b.context - a.context || b.output - a.output)
+    .map(({ context, output }) => ({ context, output }))[0];
+}
+
 export function extractCatalog(text: string): Record<string, CatalogSnapshot> {
   const out: Record<string, CatalogSnapshot> = {};
+  const limitVotes = new Map<string, { context: number; output: number }[]>();
   let searchFrom = 0;
   let count = 0;
   while (true) {
@@ -62,15 +83,19 @@ export function extractCatalog(text: string): Record<string, CatalogSnapshot> {
       const ctx = parseLimitNumber(limitRe[1]);
       const outN = parseLimitNumber(limitRe[2]);
       if (ctx > 0 && outN > 0) {
-        prev.limit = {
-          context: Math.max(prev.limit?.context ?? 0, ctx),
-          output: Math.max(prev.limit?.output ?? 0, outN),
-        };
+        const votes = limitVotes.get(modelId) ?? [];
+        votes.push({ context: ctx, output: outN });
+        limitVotes.set(modelId, votes);
       }
     }
     out[modelId] = prev;
     count++;
   }
   if (count === 0) throw new Error("未提取到任何 reasoning_options,二进制结构可能已变化");
+  // 最后按众数决定每个模型的 limit(官方/多数派条目优先)
+  for (const [modelId, votes] of limitVotes) {
+    const picked = pickModeLimit(votes);
+    if (picked) out[modelId].limit = picked;
+  }
   return out;
 }

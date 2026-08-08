@@ -30,11 +30,27 @@ describe("extractCatalog", () => {
     expect(out["a"]?.limit).toBeUndefined();
   });
 
-  test("同模型多条目取 limit 最大值(跨 provider 合并)", () => {
+  test("同模型多条目取众数(官方/多数派条目优先),平票取最大", () => {
+    // 官方条目(1e6/384000)出现 2 次,聚合商(TEE 1048576/1048576)1 次 → 众数 = 官方值
     const text =
-      `"deepseek/deepseek-v4-flash":{id:"deepseek/deepseek-v4-flash",reasoning:!0,reasoning_options:[],limit:{context:1048576,output:65536}}` +
-      `,"openrouter/deepseek-v4-flash":{id:"openrouter/deepseek-v4-flash",reasoning:!0,reasoning_options:[],limit:{context:1048576,output:384000}}`;
+      `"deepseek/deepseek-v4-flash":{id:"deepseek/deepseek-v4-flash",reasoning:!0,reasoning_options:[],limit:{context:1e6,output:384000}}` +
+      `,"deepseek-v4-flash":{id:"deepseek-v4-flash",reasoning:!0,reasoning_options:[],limit:{context:1e6,output:384000}}` +
+      `,"TEE/deepseek-v4-flash":{id:"TEE/deepseek-v4-flash",reasoning:!0,reasoning_options:[],limit:{context:1048576,output:1048576}}`;
     const out = extractCatalog(text);
-    expect(out["deepseek-v4-flash"]?.limit).toEqual({ context: 1048576, output: 384000 });
+    expect(out["deepseek-v4-flash"]?.limit).toEqual({ context: 1000000, output: 384000 });
+  });
+
+  test("多条目众数平票时取最大值", () => {
+    const text =
+      `"a/a":{id:"a/a",reasoning:!0,reasoning_options:[],limit:{context:1048576,output:65536}}` +
+      `,"b/a":{id:"b/a",reasoning:!0,reasoning_options:[],limit:{context:1048576,output:384000}}`;
+    const out = extractCatalog(text);
+    expect(out["a"]?.limit).toEqual({ context: 1048576, output: 384000 });
+  });
+
+  test("单一条目直接采用该值", () => {
+    const text = `"deepseek/deepseek-v4-flash":{id:"deepseek/deepseek-v4-flash",reasoning:!0,reasoning_options:[],limit:{context:1e6,output:384000}}`;
+    const out = extractCatalog(text);
+    expect(out["deepseek-v4-flash"]?.limit).toEqual({ context: 1000000, output: 384000 });
   });
 });
