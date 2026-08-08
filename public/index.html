@@ -65,6 +65,8 @@
           <label>模型 ID <input id="vb-id" required pattern="[a-zA-Z0-9._:+-]+" placeholder="gpt-5.6-luna"></label>
           <label>显示名 <input id="vb-name" placeholder="可选"></label>
           <label>变体列表(逗号分隔) <input id="vb-variants" required placeholder="low, medium, high, xhigh, max"></label>
+          <label>上下文 <input id="vb-limit-context" inputmode="numeric" placeholder="可选,如 200000"></label>
+          <label>输出 <input id="vb-limit-output" inputmode="numeric" placeholder="可选,如 64000"></label>
           <label>来源 <input id="vb-source" placeholder="文档链接或说明"></label>
           <div class="vb-form-actions">
             <button type="button" id="vb-form-cancel" class="secondary">取消</button>

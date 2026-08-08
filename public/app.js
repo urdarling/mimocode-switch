@@ -341,9 +341,10 @@ function renderVbList() {
     idEl.textContent = id;
     idEl.title = id;
     main.appendChild(idEl);
+    const lim = e.limit;
     const sub = document.createElement("div");
     sub.className = "vb-sub";
-    sub.textContent = [e.name, e.source, e.updated].filter(Boolean).join(" · ");
+    sub.textContent = [e.name, lim ? `ctx ${lim.context ?? "?"} · out ${lim.output ?? "?"}` : "", e.source, e.updated].filter(Boolean).join(" · ");
     sub.title = sub.textContent;
     main.appendChild(sub);
     const vars = document.createElement("div");
@@ -380,6 +381,8 @@ function openVbForm(id = null) {
   $("#vb-name").value = e.name ?? "";
   $("#vb-variants").value = (e.variants ?? []).join(", ");
   $("#vb-source").value = e.source ?? "";
+  $("#vb-limit-context").value = e.limit?.context ?? "";
+  $("#vb-limit-output").value = e.limit?.output ?? "";
   $("#vb-id").focus();
 }
 
@@ -420,6 +423,13 @@ $("#vb-form").addEventListener("submit", async (e) => {
     source: $("#vb-source").value.trim(),
     updated: new Date().toISOString().slice(0, 10),
   };
+  const cRaw = Number($("#vb-limit-context").value);
+  const oRaw = Number($("#vb-limit-output").value);
+  const hasC = Number.isFinite(cRaw) && cRaw > 0;
+  const hasO = Number.isFinite(oRaw) && oRaw > 0;
+  if (hasC || hasO) {
+    entry.limit = { ...(hasC ? { context: cRaw } : {}), ...(hasO ? { output: oRaw } : {}) };
+  }
   const next = { ...vbEntries, [id]: entry };
   try {
     await api("/api/variants/official", { method: "PUT", body: JSON.stringify(next) });
