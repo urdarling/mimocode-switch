@@ -243,11 +243,25 @@ function renderVariantsInto(container, modelId) {
   }
 }
 
+// 把模型行的 limit 输入框当前值同步进 models(预填/未触发 change 的值也会写入)
+function syncLimitFromRow(id, row) {
+  const c = Number(row.querySelector('[data-lk="context"]').value);
+  const o = Number(row.querySelector('[data-lk="output"]').value);
+  const hasC = Number.isFinite(c) && c > 0;
+  const hasO = Number.isFinite(o) && o > 0;
+  if (hasC || hasO) {
+    models[id].limit = { ...(hasC ? { context: c } : {}), ...(hasO ? { output: o } : {}) };
+  } else {
+    delete models[id].limit;
+  }
+}
+
 function renderModels() {
   modelsEl.innerHTML = "";
   Object.entries(models).forEach(([id, m]) => {
     const row = document.createElement("div");
     row.className = "model-row";
+    row.dataset.model = id;
     const col1 = document.createElement("div");
     const bl = variantData.builtin?.[id]?.limit;
     const ol = variantData.official?.[id]?.limit;
@@ -260,17 +274,7 @@ function renderModels() {
         <span>上下文</span><input class="limit-input" data-lk="context" inputmode="numeric" value="${ctx}" placeholder="?">
         <span>输出</span><input class="limit-input" data-lk="output" inputmode="numeric" value="${out}" placeholder="?">
       </div>`;
-    const syncLimit = () => {
-      const c = Number(col1.querySelector('[data-lk="context"]').value);
-      const o = Number(col1.querySelector('[data-lk="output"]').value);
-      const hasC = Number.isFinite(c) && c > 0;
-      const hasO = Number.isFinite(o) && o > 0;
-      if (hasC || hasO) {
-        models[id].limit = { ...(hasC ? { context: c } : {}), ...(hasO ? { output: o } : {}) };
-      } else {
-        delete models[id].limit;
-      }
-    };
+    const syncLimit = () => syncLimitFromRow(id, row);
     col1.querySelector('[data-lk="context"]').addEventListener("change", syncLimit);
     col1.querySelector('[data-lk="output"]').addEventListener("change", syncLimit);
     const col2 = document.createElement("div");
@@ -485,6 +489,11 @@ $("#btn-fetch-models").onclick = async () => {
 
 $("#provider-form").addEventListener("submit", async (e) => {
   e.preventDefault();
+  // 提交前兜底同步:未触发 change 的预填 limit 值也写入 models
+  modelsEl.querySelectorAll(".model-row").forEach((row) => {
+    const mid = row.dataset.model;
+    if (mid && models[mid]) syncLimitFromRow(mid, row);
+  });
   const payload = {
     name: $("#f-name").value,
     baseURL: $("#f-baseURL").value,
