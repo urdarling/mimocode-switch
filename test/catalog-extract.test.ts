@@ -53,4 +53,31 @@ describe("extractCatalog", () => {
     const out = extractCatalog(text);
     expect(out["deepseek-v4-flash"]?.limit).toEqual({ context: 1000000, output: 384000 });
   });
+
+  test("effort 型变体提取 variantParams 映射", () => {
+    const text = `"deepseek/deepseek-v4-flash":{id:"deepseek/deepseek-v4-flash",reasoning:!0,reasoning_options:[{type:"effort",values:["high","max"]}],tool_call:!0,limit:{context:1e6,output:384000}}`;
+    const out = extractCatalog(text);
+    expect(out["deepseek-v4-flash"]?.variantParams).toEqual({
+      high: { reasoningEffort: "high" },
+      max: { reasoningEffort: "max" },
+    });
+  });
+
+  test("toggle 型不产生 variantParams", () => {
+    const text = `"a":{id:"a",reasoning:!0,reasoning_options:[{type:"toggle"}]}`;
+    const out = extractCatalog(text);
+    expect(out["a"]?.variantParams).toBeUndefined();
+  });
+
+  test("同模型多条目 variantParams 按变体名合并", () => {
+    const text =
+      `"deepseek/deepseek-v4-flash":{id:"deepseek/deepseek-v4-flash",reasoning:!0,reasoning_options:[{type:"effort",values:["high","max"]}]}` +
+      `,"x/deepseek-v4-flash":{id:"x/deepseek-v4-flash",reasoning:!0,reasoning_options:[{type:"effort",values:["high","low"]}]}`;
+    const out = extractCatalog(text);
+    expect(out["deepseek-v4-flash"]?.variantParams).toEqual({
+      high: { reasoningEffort: "high" },
+      max: { reasoningEffort: "max" },
+      low: { reasoningEffort: "low" },
+    });
+  });
 });

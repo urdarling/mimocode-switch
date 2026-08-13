@@ -2,6 +2,7 @@
 export interface CatalogSnapshot {
   reasoning: boolean;
   variants: string[];
+  variantParams?: Record<string, Record<string, unknown>>;
   limit?: { context?: number; output?: number };
 }
 
@@ -62,14 +63,17 @@ export function extractCatalog(text: string): Record<string, CatalogSnapshot> {
     if (ids.length === 0) continue;
     const modelId = ids[ids.length - 1][1].split("/").pop()!;
     let values: string[] = [];
+    const params: Record<string, Record<string, unknown>> = {};
     for (const item of arrText.matchAll(/\{type:"effort",values:\[([^\]]*)\]\}/g)) {
       values = item[1].match(/"([^"]+)"/g)?.map((x) => x.slice(1, -1)) ?? [];
+      for (const v of values) params[v] = { reasoningEffort: v };
     }
     const hasToggle = /\{type:"toggle"\}/.test(arrText);
     const reasoningFlag = [...back.matchAll(/reasoning:(!0|!1)/g)].pop()?.[1] === "!0";
     const prev = out[modelId] ?? { reasoning: false, variants: [] as string[] };
     prev.reasoning = prev.reasoning || hasToggle || values.length > 0 || reasoningFlag;
     prev.variants = [...new Set([...prev.variants, ...values])];
+    if (Object.keys(params).length > 0) prev.variantParams = { ...prev.variantParams, ...params };
     // limit 在 reasoning_options 数组之后、该条目结束 } 之前;向后扫描本条目自己的 limit,
     // 不向前回看(向前会误配到前一条目)。条目结束 = 下一个 }," (对象闭合 + 逗号 + 下一条目键引号),
     // 嵌套对象(如 interleaved:{...})的 } 后跟字段名而非引号,可正确跳过。
