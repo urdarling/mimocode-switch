@@ -128,6 +128,17 @@ const server = Bun.serve({
               }
             }
           }
+          const vp = (entry as Record<string, unknown>).variantParams;
+          if (vp !== undefined) {
+            if (typeof vp !== "object" || vp === null || Array.isArray(vp)) {
+              return fail(400, `条目 ${id} 的 variantParams 必须是对象`);
+            }
+            for (const [vname, vval] of Object.entries(vp as Record<string, unknown>)) {
+              if (typeof vval !== "object" || vval === null || Array.isArray(vval)) {
+                return fail(400, `条目 ${id} 的 variantParams.${vname} 必须是对象`);
+              }
+            }
+          }
         }
         writeOfficialVariants(join(import.meta.dir, "data", "variants", "official.json"), body);
         return ok({});

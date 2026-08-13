@@ -48,4 +48,30 @@ describe("writeOfficialVariants", () => {
     expect(raw["//"]).toBeUndefined();
     expect(raw.a).toEqual({ "variants": ["low"] });
   });
+  test("write 保留 variantParams 字段", () => {
+    const f = tempFile();
+    const entries = {
+      "grok-4.6": {
+        name: "grok-4.6",
+        variants: ["low", "medium", "high"],
+        variantParams: {
+          low: { reasoningEffort: "low" },
+          medium: { reasoningEffort: "medium" },
+          high: { reasoningEffort: "high" },
+        },
+        source: "",
+        updated: "2026-08-13",
+      },
+    };
+    writeOfficialVariants(f, entries);
+    const back = readOfficialVariants(f);
+    expect(back["grok-4.6"]?.variantParams).toEqual(entries["grok-4.6"].variantParams);
+  });
+  test("无 variantParams 的条目读写后不出现该键", () => {
+    const f = tempFile();
+    const entries = { "a": { name: "A", variants: ["low"], source: "", updated: "2026-08-13" } };
+    writeOfficialVariants(f, entries);
+    const back = readOfficialVariants(f);
+    expect(back["a"]).not.toHaveProperty("variantParams");
+  });
 });
