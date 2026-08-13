@@ -137,8 +137,9 @@ function syncDefaultModelUI() {
 function prefillVariants(id) {
   const o = variantData.official?.[id];
   const b = variantData.builtin?.[id];
+  const src = o?.variantParams ?? b?.variantParams ?? {};
   const list = o?.variants?.length ? o.variants : b?.variants ?? [];
-  return list.length ? Object.fromEntries(list.map((v) => [v, {}])) : null;
+  return list.length ? Object.fromEntries(list.map((v) => [v, src[v] ?? {}])) : null;
 }
 
 function renderVariantsInto(container, modelId) {
@@ -160,7 +161,13 @@ function renderVariantsInto(container, modelId) {
       if (isOn) {
         delete models[modelId].variants[v];
         if (Object.keys(models[modelId].variants).length === 0) delete models[modelId].variants;
-      } else { models[modelId].variants ??= {}; models[modelId].variants[v] = {}; }
+      } else {
+        models[modelId].variants ??= {};
+        const src = variantData.official?.[modelId]?.variantParams?.[v]
+          ?? variantData.builtin?.[modelId]?.variantParams?.[v]
+          ?? {};
+        models[modelId].variants[v] = src;
+      }
       renderVariantsInto(container, modelId);
     };
     return el;
