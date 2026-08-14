@@ -449,6 +449,11 @@ $("#vb-form").addEventListener("submit", async (e) => {
     source: $("#vb-source").value.trim(),
     updated: new Date().toISOString().slice(0, 10),
   };
+  // 编辑既有条目时保留其 variantParams(表单无此字段,编辑其他字段不应丢参数映射)
+  const prevParams = vbEntries[id]?.variantParams;
+  if (prevParams && Object.keys(prevParams).length > 0) {
+    entry.variantParams = prevParams;
+  }
   const cRaw = Number($("#vb-limit-context").value);
   const oRaw = Number($("#vb-limit-output").value);
   const hasC = Number.isFinite(cRaw) && cRaw > 0;
