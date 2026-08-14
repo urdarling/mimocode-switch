@@ -107,6 +107,7 @@ let models = {};
 function openForm(provider) {
   editingId = provider?.id ?? null;
   models = provider?.config?.models ? JSON.parse(JSON.stringify(provider.config.models)) : {};
+  backfillVariantParams();
   $("#form-title").textContent = editingId ? "编辑供应商" : "添加供应商";
   $("#f-original-id").value = provider?.id ?? "";
   $("#f-id").value = provider?.id ?? "";
@@ -132,6 +133,20 @@ function syncDefaultModelUI() {
   const sel = $("#f-default-model");
   sel.disabled = !(checked && has);
   if (checked && has && !sel.value) sel.selectedIndex = 0;
+}
+
+// 打开编辑时,已存的空对象变体若在数据源(官方/内置)有参数映射,自动补齐——
+// 修复存量配置保存后变体参数仍为空的问题(迁移旧空对象变体)
+function backfillVariantParams() {
+  Object.entries(models).forEach(([id, m]) => {
+    if (!m?.variants || Object.keys(m.variants).length === 0) return;
+    const src = variantData.official?.[id]?.variantParams ?? variantData.builtin?.[id]?.variantParams ?? {};
+    Object.entries(m.variants).forEach(([v, val]) => {
+      if (typeof val === "object" && val !== null && Object.keys(val).length === 0 && src[v]) {
+        m.variants[v] = src[v];
+      }
+    });
+  });
 }
 
 function prefillVariants(id) {
