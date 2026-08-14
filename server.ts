@@ -7,7 +7,7 @@ import {
 import { readMetadata, writeMetadata } from "./lib/metadata";
 import { readConfig, writeConfig } from "./lib/config-store";
 import { resolveConfigPaths } from "./lib/config-path";
-import { readOfficialVariants, writeOfficialVariants } from "./lib/variants-store";
+import { mergeOfficialEntries, readOfficialVariants, writeOfficialVariants } from "./lib/variants-store";
 
 const paths = resolveConfigPaths();
 const PORT = Number(process.env.PORT ?? 4173);
@@ -109,6 +109,7 @@ const server = Bun.serve({
         }
         for (const [id, entry] of Object.entries(body)) {
           if (id === "//") continue; // 说明键,非条目
+          if (entry === null) continue; // 删除标记:值为 null 表示删除该条目
           if (typeof entry !== "object" || entry === null || Array.isArray(entry)) {
             return fail(400, `条目 ${id} 必须是对象`);
           }
@@ -140,7 +141,10 @@ const server = Bun.serve({
             }
           }
         }
-        writeOfficialVariants(join(import.meta.dir, "data", "variants", "official.json"), body);
+        const variantsFile = join(import.meta.dir, "data", "variants", "official.json");
+        // 增量合并写入:只更新/删除 patch 中的条目,文件内其他条目与 `//` 说明键保留
+        const merged = mergeOfficialEntries(readOfficialVariants(variantsFile), body);
+        writeOfficialVariants(variantsFile, merged);
         return ok({});
       } catch (e) {
         return fail(400, (e as Error).message);

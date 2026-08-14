@@ -461,7 +461,8 @@ $("#vb-form").addEventListener("submit", async (e) => {
   if (hasC || hasO) {
     entry.limit = { ...(hasC ? { context: cRaw } : {}), ...(hasO ? { output: oRaw } : {}) };
   }
-  const next = { ...vbEntries, [id]: entry };
+  // 增量提交:只提交目标条目,服务端 merge 保留文件内其他条目
+  const next = { [id]: entry };
   try {
     await api("/api/variants/official", { method: "PUT", body: JSON.stringify(next) });
     closeVbForm();
@@ -479,10 +480,9 @@ $("#vb-list").addEventListener("click", async (e) => {
   if (btn.dataset.vb === "edit") { openVbForm(id); return; }
   if (btn.dataset.vb === "del") {
     if (!confirm(`删除条目 ${id}?`)) return;
-    const next = { ...vbEntries };
-    delete next[id];
     try {
-      await api("/api/variants/official", { method: "PUT", body: JSON.stringify(next) });
+      // 增量删除:发 null 标记,服务端只删该条目,文件内其他条目保留
+      await api("/api/variants/official", { method: "PUT", body: JSON.stringify({ [id]: null }) });
       await vbRefresh();
       await syncVariantData();
     } catch (err) {

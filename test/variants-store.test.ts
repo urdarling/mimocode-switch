@@ -1,7 +1,7 @@
 import { afterAll, describe, expect, test } from "bun:test";
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { readOfficialVariants, writeOfficialVariants } from "../lib/variants-store";
+import { mergeOfficialEntries, readOfficialVariants, writeOfficialVariants } from "../lib/variants-store";
 import { makeTestDir, removeTestDir, TEST_TMP_ROOT } from "./helpers";
 
 const dirs: string[] = [];
@@ -73,5 +73,40 @@ describe("writeOfficialVariants", () => {
     writeOfficialVariants(f, entries);
     const back = readOfficialVariants(f);
     expect(back["a"]).not.toHaveProperty("variantParams");
+  });
+});
+
+describe("mergeOfficialEntries", () => {
+  test("patch 中的条目覆盖既有条目,其余保留", () => {
+    const existing = { "a": { variants: ["low"] }, "b": { variants: ["high"] } };
+    const merged = mergeOfficialEntries(existing, { "a": { variants: ["low", "high"] } });
+    expect(merged["a"]).toEqual({ variants: ["low", "high"] });
+    expect(merged["b"]).toEqual({ variants: ["high"] });
+  });
+
+  test("patch 中值为 null 的条目被删除,其余保留", () => {
+    const existing = { "a": { variants: ["low"] }, "b": { variants: ["high"] } };
+    const merged = mergeOfficialEntries(existing, { "a": null });
+    expect(merged["a"]).toBeUndefined();
+    expect(merged["b"]).toEqual({ variants: ["high"] });
+  });
+
+  test("patch 新增条目,不存在的原文件可合并", () => {
+    const merged = mergeOfficialEntries({}, { "c": { variants: ["low"] } });
+    expect(merged["c"]).toEqual({ variants: ["low"] });
+  });
+
+  test("// 说明键不被 patch 覆盖且保留", () => {
+    const existing = { "//": "维护说明", "a": { variants: ["low"] } };
+    const merged = mergeOfficialEntries(existing, { "a": { variants: ["high"] } });
+    expect(merged["//"]).toBe("维护说明");
+    expect(merged["a"]).toEqual({ variants: ["high"] });
+  });
+
+  test("原文件不变(纯函数)", () => {
+    const existing = { "a": { variants: ["low"] }, "b": { variants: ["high"] } };
+    const snapshot = JSON.stringify(existing);
+    mergeOfficialEntries(existing, { "a": null });
+    expect(JSON.stringify(existing)).toBe(snapshot);
   });
 });
