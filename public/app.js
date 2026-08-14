@@ -135,15 +135,15 @@ function syncDefaultModelUI() {
   if (checked && has && !sel.value) sel.selectedIndex = 0;
 }
 
-// 打开编辑时,已存的空对象变体若在数据源(官方/内置)有参数映射,自动补齐——
-// 修复存量配置保存后变体参数仍为空的问题(迁移旧空对象变体)
+// 打开编辑时,已存的空对象变体自动补齐参数——数据源有映射用数据源的,
+// 否则兜底生成 reasoningEffort 同名(如实保存用户填的变体,不因"官方没有"而留空)
 function backfillVariantParams() {
   Object.entries(models).forEach(([id, m]) => {
     if (!m?.variants || Object.keys(m.variants).length === 0) return;
     const src = variantData.official?.[id]?.variantParams ?? variantData.builtin?.[id]?.variantParams ?? {};
     Object.entries(m.variants).forEach(([v, val]) => {
-      if (typeof val === "object" && val !== null && Object.keys(val).length === 0 && src[v]) {
-        m.variants[v] = src[v];
+      if (typeof val === "object" && val !== null && Object.keys(val).length === 0) {
+        m.variants[v] = src[v] ?? { reasoningEffort: v };
       }
     });
   });
@@ -154,7 +154,7 @@ function prefillVariants(id) {
   const b = variantData.builtin?.[id];
   const src = o?.variantParams ?? b?.variantParams ?? {};
   const list = o?.variants?.length ? o.variants : b?.variants ?? [];
-  return list.length ? Object.fromEntries(list.map((v) => [v, src[v] ?? {}])) : null;
+  return list.length ? Object.fromEntries(list.map((v) => [v, src[v] ?? { reasoningEffort: v }])) : null;
 }
 
 function renderVariantsInto(container, modelId) {
@@ -180,7 +180,7 @@ function renderVariantsInto(container, modelId) {
         models[modelId].variants ??= {};
         const src = variantData.official?.[modelId]?.variantParams?.[v]
           ?? variantData.builtin?.[modelId]?.variantParams?.[v]
-          ?? {};
+          ?? { reasoningEffort: v };
         models[modelId].variants[v] = src;
       }
       renderVariantsInto(container, modelId);
