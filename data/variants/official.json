@@ -60,6 +60,8 @@
       "high",
       "xhigh"
     ],
+    "source": "",
+    "updated": "2026-08-14",
     "variantParams": {
       "low": {
         "reasoningEffort": "low"
@@ -71,8 +73,6 @@
         "reasoningEffort": "high"
       }
     },
-    "source": "",
-    "updated": "2026-08-13",
     "limit": {
       "context": 500000,
       "output": 128000
