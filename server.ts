@@ -153,7 +153,7 @@ const server = Bun.serve({
 
     if (method === "POST" && pathname === "/api/providers") {
       try {
-        const body = await req.json() as { id: string; name: string; baseURL: string; apiKey: string; headers?: Record<string, string>; models?: Record<string, { name?: string; variants?: Record<string, unknown>; limit?: { context?: number; output?: number } }>; note?: string; link?: string };
+        const body = await req.json() as { id: string; name: string; baseURL: string; apiKey: string; headers?: Record<string, string>; models?: Record<string, { name?: string; variants?: Record<string, unknown>; limit?: { context?: number; output?: number }; modalities?: { input: string[]; output: string[] }; reasoning?: boolean }>; note?: string; link?: string };
         if (!body.id || !body.name || !body.baseURL || !body.apiKey) {
           return fail(400, "标识、名称、Base URL、API Key 均为必填");
         }
@@ -177,7 +177,7 @@ const server = Bun.serve({
 
     if (method === "PUT" && providerMatch) {
       try {
-        const body = await req.json() as { name: string; baseURL: string; apiKey: string; headers?: Record<string, string>; models?: Record<string, { name?: string; variants?: Record<string, unknown>; limit?: { context?: number; output?: number } }>; note?: string; link?: string };
+        const body = await req.json() as { name: string; baseURL: string; apiKey: string; headers?: Record<string, string>; models?: Record<string, { name?: string; variants?: Record<string, unknown>; limit?: { context?: number; output?: number }; modalities?: { input: string[]; output: string[] }; reasoning?: boolean }>; note?: string; link?: string };
         const cfg = loadConfig() as never;
         const next = updateProvider(cfg, id, body);
         writeConfig(paths.configFile, next);

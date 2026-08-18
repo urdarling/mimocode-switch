@@ -29,6 +29,24 @@ describe("buildProvider", () => {
     const p = buildProvider({ name: "X", baseURL: "https://x.com", apiKey: "k", models: { m: { name: "M", limit: { context: 1050000, output: 128000 } } } });
     expect(p.models!.m.limit).toEqual({ context: 1050000, output: 128000 });
   });
+  test("models 透传 modalities", () => {
+    const p = buildProvider({ name: "X", baseURL: "https://x.com", apiKey: "k", models: { m: { name: "M", modalities: { input: ["text", "image"], output: ["text"] } } } });
+    expect(p.models!.m.modalities).toEqual({ input: ["text", "image"], output: ["text"] });
+  });
+  test("models 透传 reasoning", () => {
+    const p = buildProvider({ name: "X", baseURL: "https://x.com", apiKey: "k", models: { m: { name: "M", reasoning: true } } });
+    expect(p.models!.m.reasoning).toBe(true);
+  });
+  test("models 透传 options", () => {
+    const p = buildProvider({ name: "X", baseURL: "https://x.com", apiKey: "k", models: { m: { name: "M", options: { store: false } } } });
+    expect(p.models!.m.options).toEqual({ store: false });
+  });
+  test("models 无 modalities/reasoning 时不产生字段(向后兼容)", () => {
+    const p = buildProvider({ name: "X", baseURL: "https://x.com", apiKey: "k", models: { m: { name: "M" } } });
+    expect(p.models!.m.modalities).toBeUndefined();
+    expect(p.models!.m.reasoning).toBeUndefined();
+    expect(p.models!.m.options).toBeUndefined();
+  });
 });
 
 describe("listProviders", () => {

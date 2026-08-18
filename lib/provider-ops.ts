@@ -21,6 +21,9 @@ export interface ModelSpec {
   name?: string;
   variants?: Record<string, unknown>;
   limit?: { context?: number; output?: number };
+  modalities?: { input: string[]; output: string[] };
+  reasoning?: boolean;
+  options?: Record<string, unknown>;
 }
 
 export interface ConfigData {

@@ -110,3 +110,18 @@ describe("mergeOfficialEntries", () => {
     expect(JSON.stringify(existing)).toBe(snapshot);
   });
 });
+
+describe("mergeOfficialEntries — modalities/reasoning 透传", () => {
+  test("合并带 modalities/reasoning 的条目", () => {
+    const f = tempFile();
+    writeFileSync(f, JSON.stringify({ "//": "说明", "a": { "variants": ["low"] } }, null, 2), "utf8");
+    const existing = readOfficialVariants(f);
+    const merged = mergeOfficialEntries(existing, { "b": { "variants": ["high"], "modalities": { "input": ["text", "image"], "output": ["text"] }, "reasoning": true } });
+    expect(merged.b).toEqual({ "variants": ["high"], "modalities": { "input": ["text", "image"], "output": ["text"] }, "reasoning": true });
+  });
+  test("删除带 modalities/reasoning 的条目(null 值)", () => {
+    const existing = { "//": "说明", "a": { "variants": ["low"], "modalities": { "input": ["text"], "output": ["text"] }, "reasoning": false } };
+    const merged = mergeOfficialEntries(existing as any, { "a": null });
+    expect(merged.a).toBeUndefined();
+  });
+});
