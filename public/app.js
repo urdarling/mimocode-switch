@@ -157,6 +157,15 @@ function prefillVariants(id) {
   return list.length ? Object.fromEntries(list.map((v) => [v, src[v] ?? { reasoningEffort: v }])) : null;
 }
 
+function prefillMeta(id) {
+  const meta = {};
+  const reasoning = variantData.builtin?.[id]?.reasoning ?? variantData.official?.[id]?.reasoning;
+  if (reasoning !== undefined) meta.reasoning = reasoning;
+  const modalities = variantData.official?.[id]?.modalities;
+  if (modalities) meta.modalities = modalities;
+  return meta;
+}
+
 function renderVariantsInto(container, modelId) {
   const m = models[modelId];
   const selected = Object.keys(m?.variants ?? {});
@@ -278,6 +287,24 @@ function syncLimitFromRow(id, row) {
   }
 }
 
+function syncModalitiesFromRow(id, row) {
+  const checked = [...row.querySelectorAll('[data-mod]')].filter((cb) => cb.checked).map((cb) => cb.dataset.mod);
+  const nonText = checked.filter((m) => m !== "text");
+  if (nonText.length > 0) {
+    const existingOutput = models[id]?.modalities?.output;
+    models[id].modalities = { input: ["text", ...nonText], output: existingOutput ?? ["text"] };
+  } else {
+    delete models[id].modalities;
+  }
+}
+
+function syncReasoningFromRow(id, row) {
+  const val = row.querySelector("[data-rs]")?.value;
+  if (val === "true") models[id].reasoning = true;
+  else if (val === "false") models[id].reasoning = false;
+  else delete models[id].reasoning;
+}
+
 function renderModels() {
   modelsEl.innerHTML = "";
   Object.entries(models).forEach(([id, m]) => {
@@ -289,16 +316,38 @@ function renderModels() {
     const ol = variantData.official?.[id]?.limit;
     const ctx = m?.limit?.context ?? ol?.context ?? bl?.context ?? "";
     const out = m?.limit?.output ?? ol?.output ?? bl?.output ?? "";
+    const modIn = m?.modalities?.input ?? [];
+    const rsVal = m?.reasoning === true ? "true" : m?.reasoning === false ? "false" : "";
     col1.innerHTML = `
       <div class="m-id" title="${escapeHtml(id)}">${escapeHtml(id)}</div>
       <div class="m-name" title="${escapeHtml(m?.name ?? "")}">${escapeHtml(m?.name ?? "")}</div>
       <div class="m-limit">
         <span>上下文</span><input class="limit-input" data-lk="context" inputmode="numeric" value="${ctx}" placeholder="?">
         <span>输出</span><input class="limit-input" data-lk="output" inputmode="numeric" value="${out}" placeholder="?">
+      </div>
+      <div class="m-modalities">
+        <span>模态</span>
+        <span><input type="checkbox" data-mod="text" checked disabled> text</span>
+        <span><input type="checkbox" data-mod="image" ${modIn.includes("image") ? "checked" : ""}> image</span>
+        <span><input type="checkbox" data-mod="audio" ${modIn.includes("audio") ? "checked" : ""}> audio</span>
+        <span><input type="checkbox" data-mod="video" ${modIn.includes("video") ? "checked" : ""}> video</span>
+        <span><input type="checkbox" data-mod="pdf" ${modIn.includes("pdf") ? "checked" : ""}> pdf</span>
+      </div>
+      <div class="m-reasoning">
+        <span>推理</span>
+        <select class="reasoning-select" data-rs>
+          <option value="" ${rsVal === "" ? "selected" : ""}>未设置</option>
+          <option value="true" ${rsVal === "true" ? "selected" : ""}>支持</option>
+          <option value="false" ${rsVal === "false" ? "selected" : ""}>不支持</option>
+        </select>
       </div>`;
     const syncLimit = () => syncLimitFromRow(id, row);
     col1.querySelector('[data-lk="context"]').addEventListener("change", syncLimit);
     col1.querySelector('[data-lk="output"]').addEventListener("change", syncLimit);
+    const syncMod = () => syncModalitiesFromRow(id, row);
+    const syncRs = () => syncReasoningFromRow(id, row);
+    col1.querySelectorAll('[data-mod]').forEach((cb) => cb.addEventListener("change", syncMod));
+    col1.querySelector('[data-rs]')?.addEventListener("change", syncRs);
     const col2 = document.createElement("div");
     col2.className = "m-col-variants";
     renderVariantsInto(col2, id);
@@ -494,7 +543,7 @@ $("#vb-list").addEventListener("click", async (e) => {
 $("#btn-add-model").onclick = () => {
   const input = $("#f-model-new");
   const id = input.value.trim();
-  if (id && !models[id]) { models[id] = { name: id, ...(prefillVariants(id) ? { variants: prefillVariants(id) } : {}) }; renderModels(); }
+  if (id && !models[id]) { models[id] = { name: id, ...prefillMeta(id), ...(prefillVariants(id) ? { variants: prefillVariants(id) } : {}) }; renderModels(); }
   input.value = "";
 };
 
@@ -506,7 +555,7 @@ $("#btn-fetch-models").onclick = async () => {
       method: "POST",
       body: JSON.stringify({ baseURL: $("#f-baseURL").value, apiKey: $("#f-apiKey").value }),
     });
-    data.models.forEach((m) => { models[m] = models[m] ?? { name: m, ...(prefillVariants(m) ? { variants: prefillVariants(m) } : {}) }; });
+    data.models.forEach((m) => { models[m] = models[m] ?? { name: m, ...prefillMeta(m), ...(prefillVariants(m) ? { variants: prefillVariants(m) } : {}) }; });
     renderModels();
   } catch (e) {
     alert("获取模型失败: " + e.message);
@@ -519,7 +568,11 @@ $("#provider-form").addEventListener("submit", async (e) => {
   // 提交前兜底同步:未触发 change 的预填 limit 值也写入 models
   modelsEl.querySelectorAll(".model-row").forEach((row) => {
     const mid = row.dataset.model;
-    if (mid && models[mid]) syncLimitFromRow(mid, row);
+    if (mid && models[mid]) {
+      syncLimitFromRow(mid, row);
+      syncModalitiesFromRow(mid, row);
+      syncReasoningFromRow(mid, row);
+    }
   });
   const payload = {
     name: $("#f-name").value,
