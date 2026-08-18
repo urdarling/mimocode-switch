@@ -67,6 +67,20 @@
           <label>变体列表(逗号分隔) <input id="vb-variants" required placeholder="low, medium, high, xhigh, max"></label>
           <label>上下文 <input id="vb-limit-context" inputmode="numeric" placeholder="可选,如 200000"></label>
           <label>输出 <input id="vb-limit-output" inputmode="numeric" placeholder="可选,如 64000"></label>
+          <label class="vb-modalities">模态
+            <span><input type="checkbox" data-vbmod="text" checked disabled> text</span>
+            <span><input type="checkbox" data-vbmod="image"> image</span>
+            <span><input type="checkbox" data-vbmod="audio"> audio</span>
+            <span><input type="checkbox" data-vbmod="video"> video</span>
+            <span><input type="checkbox" data-vbmod="pdf"> pdf</span>
+          </label>
+          <label>推理
+            <select id="vb-reasoning">
+              <option value="">未设置</option>
+              <option value="true">支持</option>
+              <option value="false">不支持</option>
+            </select>
+          </label>
           <label>来源 <input id="vb-source" placeholder="文档链接或说明"></label>
           <div class="vb-form-actions">
             <button type="button" id="vb-form-cancel" class="secondary">取消</button>

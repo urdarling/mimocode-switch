@@ -417,9 +417,11 @@ function renderVbList() {
     idEl.title = id;
     main.appendChild(idEl);
     const lim = e.limit;
+    const modStr = e.modalities?.input?.length > 1 ? `模态 ${e.modalities.input.join("+")}` : "";
+    const rsStr = e.reasoning === true ? "推理:支持" : e.reasoning === false ? "推理:不支持" : "";
     const sub = document.createElement("div");
     sub.className = "vb-sub";
-    sub.textContent = [e.name, lim ? `ctx ${lim.context ?? "?"} · out ${lim.output ?? "?"}` : "", e.source, e.updated].filter(Boolean).join(" · ");
+    sub.textContent = [e.name, lim ? `ctx ${lim.context ?? "?"} · out ${lim.output ?? "?"}` : "", modStr, rsStr, e.source, e.updated].filter(Boolean).join(" · ");
     sub.title = sub.textContent;
     main.appendChild(sub);
     const vars = document.createElement("div");
@@ -458,6 +460,12 @@ function openVbForm(id = null) {
   $("#vb-source").value = e.source ?? "";
   $("#vb-limit-context").value = e.limit?.context ?? "";
   $("#vb-limit-output").value = e.limit?.output ?? "";
+  const modIn = e.modalities?.input ?? [];
+  document.querySelectorAll('#vb-form [data-vbmod]').forEach((cb) => {
+    if (cb.dataset.vbmod !== "text") cb.checked = modIn.includes(cb.dataset.vbmod);
+  });
+  const rsVal = e.reasoning === true ? "true" : e.reasoning === false ? "false" : "";
+  $("#vb-reasoning").value = rsVal;
   $("#vb-id").focus();
 }
 
@@ -510,6 +518,17 @@ $("#vb-form").addEventListener("submit", async (e) => {
   if (hasC || hasO) {
     entry.limit = { ...(hasC ? { context: cRaw } : {}), ...(hasO ? { output: oRaw } : {}) };
   }
+  // modalities
+  const modChecked = [...document.querySelectorAll('#vb-form [data-vbmod]')].filter((cb) => cb.checked).map((cb) => cb.dataset.vbmod);
+  const modNonText = modChecked.filter((m) => m !== "text");
+  if (modNonText.length > 0) {
+    const existingOutput = vbEntries[id]?.modalities?.output;
+    entry.modalities = { input: ["text", ...modNonText], output: existingOutput ?? ["text"] };
+  }
+  // reasoning
+  const rsVal = $("#vb-reasoning").value;
+  if (rsVal === "true") entry.reasoning = true;
+  else if (rsVal === "false") entry.reasoning = false;
   // 增量提交:只提交目标条目,服务端 merge 保留文件内其他条目
   const next = { [id]: entry };
   try {

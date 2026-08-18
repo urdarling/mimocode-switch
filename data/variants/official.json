@@ -1,5 +1,5 @@
 {
-  "//": "官方文档模型库:手动维护。字段:name 显示名, variants 官方支持的变体列表, variantParams 可选(变体名→请求参数映射,如 {\"high\":{\"reasoningEffort\":\"high\"}},effort 型变体必填以生效思考强度), limit 可选(模型上下文/输出上限,如 {\"context\":200000,\"output\":64000}), source 文档链接, updated 更新日期。新增条目:查模型官方文档确认支持哪些思考强度与上下文/输出限制后追加。",
+  "//": "官方文档模型库:手动维护。字段:name 显示名, variants 官方支持的变体列表, variantParams 可选(变体名→请求参数映射,如 {\"high\":{\"reasoningEffort\":\"high\"}},effort 型变体必填以生效思考强度), limit 可选(模型上下文/输出上限,如 {\"context\":200000,\"output\":64000}), modalities 可选(输入输出模态,如 {\"input\":[\"text\",\"image\"],\"output\":[\"text\"]}), reasoning 可选(boolean,是否支持推理), source 文档链接, updated 更新日期。新增条目:查模型官方文档确认支持哪些思考强度与上下文/输出限制后追加。",
   "gpt-5.6": {
     "name": "GPT-5.6 (Sol)",
     "variants": [
@@ -11,46 +11,6 @@
     ],
     "source": "供应商推荐配置",
     "updated": "2026-08-02"
-  },
-  "gpt-5.6-luna": {
-    "name": "GPT-5.6 Luna",
-    "variants": [
-      "low",
-      "medium",
-      "high",
-      "xhigh",
-      "max"
-    ],
-    "source": "供应商推荐配置",
-    "updated": "2026-08-02"
-  },
-  "deepseek-v4-flash-0731": {
-    "name": "dsv4-new",
-    "variants": [
-      "low",
-      "high",
-      "max"
-    ],
-    "source": "",
-    "updated": "2026-08-08",
-    "limit": {
-      "context": 1000000,
-      "output": 384000
-    }
-  },
-  "qwen3.8-max": {
-    "name": "qwen",
-    "variants": [
-      "low",
-      "medium",
-      "xhigh"
-    ],
-    "source": "https://docs.qwen.ai/",
-    "updated": "2026-08-08",
-    "limit": {
-      "context": 1000000,
-      "output": 131072
-    }
   },
   "grok-4.6": {
     "name": "grok-4.6",
