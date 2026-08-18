@@ -10,7 +10,17 @@
       "max"
     ],
     "source": "供应商推荐配置",
-    "updated": "2026-08-02"
+    "updated": "2026-08-18",
+    "modalities": {
+      "input": [
+        "text",
+        "image"
+      ],
+      "output": [
+        "text"
+      ]
+    },
+    "reasoning": true
   },
   "grok-4.6": {
     "name": "grok-4.6",
@@ -21,7 +31,7 @@
       "xhigh"
     ],
     "source": "",
-    "updated": "2026-08-14",
+    "updated": "2026-08-18",
     "variantParams": {
       "low": {
         "reasoningEffort": "low"
@@ -36,6 +46,7 @@
     "limit": {
       "context": 500000,
       "output": 128000
-    }
+    },
+    "reasoning": true
   }
 }
