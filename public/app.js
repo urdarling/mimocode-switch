@@ -466,6 +466,11 @@ function renderVbList() {
     editBtn.dataset.vb = "edit";
     editBtn.dataset.id = id;
     editBtn.textContent = "编辑";
+    const copyBtn = document.createElement("button");
+    copyBtn.type = "button";
+    copyBtn.dataset.vb = "copy";
+    copyBtn.dataset.id = id;
+    copyBtn.textContent = "复制";
     const delBtn = document.createElement("button");
     delBtn.type = "button";
     delBtn.dataset.vb = "del";
@@ -473,6 +478,7 @@ function renderVbList() {
     delBtn.className = "danger";
     delBtn.textContent = "删除";
     ops.appendChild(editBtn);
+    ops.appendChild(copyBtn);
     ops.appendChild(delBtn);
     row.appendChild(main);
     row.appendChild(vars);
@@ -481,11 +487,14 @@ function renderVbList() {
   });
 }
 
-function openVbForm(id = null) {
+let vbCopySourceId = null;
+
+function openVbForm(id = null, copy = false) {
   const e = id ? vbEntries[id] : {};
+  vbCopySourceId = copy ? id : null;
   $("#vb-form-wrap").classList.remove("hidden");
-  $("#vb-id").value = id ?? "";
-  $("#vb-id").disabled = !!id;
+  $("#vb-id").value = copy ? `${id}-copy` : id ?? "";
+  $("#vb-id").disabled = !!id && !copy;
   $("#vb-name").value = e.name ?? "";
   $("#vb-variants").value = (e.variants ?? []).join(", ");
   $("#vb-source").value = e.source ?? "";
@@ -531,14 +540,16 @@ $("#vb-form").addEventListener("submit", async (e) => {
   e.preventDefault();
   const id = $("#vb-id").value.trim();
   if (!id) return;
+  if (vbEntries[id] && id !== vbCopySourceId) { alert(`条目 ${id} 已存在,请换一个 ID`); return; }
   const entry = {
     name: $("#vb-name").value.trim(),
     variants: $("#vb-variants").value.split(",").map((x) => x.trim()).filter(Boolean),
     source: $("#vb-source").value.trim(),
     updated: new Date().toISOString().slice(0, 10),
   };
-  // 编辑既有条目时保留其 variantParams(表单无此字段,编辑其他字段不应丢参数映射)
-  const prevParams = vbEntries[id]?.variantParams;
+  // 编辑/复制时保留 variantParams(表单无此字段):编辑取自身,复制取源条目
+  const paramsFrom = vbCopySourceId ?? id;
+  const prevParams = vbEntries[paramsFrom]?.variantParams;
   if (prevParams && Object.keys(prevParams).length > 0) {
     entry.variantParams = prevParams;
   }
@@ -553,7 +564,7 @@ $("#vb-form").addEventListener("submit", async (e) => {
   const modChecked = [...document.querySelectorAll('#vb-form [data-vbmod]')].filter((cb) => cb.checked).map((cb) => cb.dataset.vbmod);
   const modNonText = modChecked.filter((m) => m !== "text");
   if (modNonText.length > 0) {
-    const existingOutput = vbEntries[id]?.modalities?.output;
+    const existingOutput = vbEntries[vbCopySourceId ?? id]?.modalities?.output;
     entry.modalities = { input: ["text", ...modNonText], output: existingOutput ?? ["text"] };
   }
   // reasoning
@@ -577,6 +588,7 @@ $("#vb-list").addEventListener("click", async (e) => {
   if (!btn) return;
   const id = btn.dataset.id;
   if (btn.dataset.vb === "edit") { openVbForm(id); return; }
+  if (btn.dataset.vb === "copy") { openVbForm(id, true); return; }
   if (btn.dataset.vb === "del") {
     if (!confirm(`删除条目 ${id}?`)) return;
     try {
