@@ -1,4 +1,4 @@
-[中文](README.md) | [English](README.en.md)
+[中文](README.md) | [English](README.en.md) | [Releases](https://github.com/urdarling/mimocode-switch/releases)
 
 # mimocode Provider Manager
 
@@ -12,9 +12,15 @@ parallel metadata file `mimocode-ui.json`.
 - **Fetch models** — pull the provider's `/models` list automatically
 - Set the default provider and default model (switch anytime from the card dropdown)
 - Model variants (reasoning effort) annotation & selection: dual sources — built-in catalog
-  (snapshot of mimocode's embedded data) + official variants library, with chip multi-select
+  (snapshot of mimocode's embedded data) + official variants library, with chip multi-select;
+  chips automatically carry the `reasoningEffort` request parameter
 - **Variants library** UI to maintain official variant entries; model context/output
-  windows are auto-prefilled and editable
+  windows are auto-prefilled and editable; duplicate an existing entry as a starting point
+- Per-model capabilities: input modalities (text/image/audio/video/pdf) and a tri-state
+  reasoning toggle, configurable in both the model editor and the variants library —
+  enables image recognition for custom models not in the built-in catalog
+- Built-in provider auth management: view signed-in providers (auth.json, redacted) and
+  log out with one click
 - Drag-and-drop card ordering
 
 ## Requirements
@@ -71,4 +77,6 @@ bun test
 
 Sensitive information such as API keys lives only in your local mimocode
 configuration. This repository contains no credentials; the tool reads the
-configuration of whichever machine it runs on.
+configuration of whichever machine it runs on. Built-in provider credentials
+(auth.json) also stay local — the tool only shows a redacted list (no secrets)
+and performs logout.
