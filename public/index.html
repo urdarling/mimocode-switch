@@ -16,6 +16,12 @@
   <main>
     <div id="list" class="cards"></div>
     <p id="empty" class="empty hidden">暂无供应商,点击右上角添加。</p>
+    <section id="auth-section" class="auth-section hidden">
+      <h2 class="section-title">已登录供应商</h2>
+      <p class="section-hint">认证信息存于 auth.json,登出后重新登录可恢复。注意:mimocode 内置目录的供应商(如 xiaomi)即使登出也仍会显示在模型列表中,需在 mimocode.jsonc 的 disabled_providers 中禁用。</p>
+      <div id="auth-list" class="cards"></div>
+      <p id="auth-empty" class="empty hidden">暂无已登录的供应商。</p>
+    </section>
   </main>
 
   <dialog id="form-dialog" aria-labelledby="form-title">

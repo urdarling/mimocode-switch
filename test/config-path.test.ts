@@ -13,11 +13,17 @@ describe("resolveConfigPaths", () => {
     expect(p.configFile).toBe(join("D:/mimo", "config", "mimocode.jsonc"));
     expect(p.metadataFile).toBe(join("D:/mimo", "config", "mimocode-ui.json"));
     expect(p.backupDir).toBe(join("D:/mimo", "config", "backups"));
+    expect(p.authFile).toBe(join("D:/mimo", "data", "auth.json"));
   });
 
   test("无 MIMOCODE_HOME 时用 ~/.config/mimocode(Windows 也如此)", () => {
     const p = resolveConfigPaths({ USERPROFILE: "C:/Users/t", HOME: undefined });
     expect(p.configFile).toBe(join("C:/Users/t", ".config", "mimocode", "mimocode.jsonc"));
+  });
+
+  test("无 MIMOCODE_HOME 时 authFile 在 ~/.local/share/mimocode(Windows 也如此)", () => {
+    const p = resolveConfigPaths({ USERPROFILE: "C:/Users/t", HOME: undefined });
+    expect(p.authFile).toBe(join("C:/Users/t", ".local", "share", "mimocode", "auth.json"));
   });
 
   test("候选顺序:已存在 mimocode.json 时优先选择它", () => {

@@ -265,6 +265,12 @@ fieldset legend { font-size: 12px; color: var(--muted); padding: 0 6px; }
 /* ---- 空态/错误 ---- */
 .empty { color: var(--muted); text-align: center; margin-top: 64px; font-size: 13px; }
 .hidden { display: none !important; }
+
+/* ---- 内置供应商分区 ---- */
+.auth-section { margin-top: 36px; border-top: 1px solid var(--border); padding-top: 20px; }
+.auth-section .section-title { font-size: 14px; font-weight: 650; margin: 0 0 4px; }
+.auth-section .section-hint { color: var(--muted); font-size: 12px; margin: 0 0 16px; }
+.auth-section .badge.auth-type { background: var(--border-strong); color: var(--text); font-weight: 500; }
 .vb-modalities { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
 .vb-modalities span { display: inline-flex; align-items: center; gap: 2px; font-size: 12px; }
 .vb-modalities input[type="checkbox"] { margin: 0; width: 12px; height: 12px; }

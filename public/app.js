@@ -1,9 +1,13 @@
 const $ = (sel) => document.querySelector(sel);
 const listEl = $("#list");
 const emptyEl = $("#empty");
+const authListEl = $("#auth-list");
+const authSectionEl = $("#auth-section");
+const authEmptyEl = $("#auth-empty");
 
 let state = { providers: [], activeModel: "", metadata: { order: [], notes: {}, links: {} } };
 let variantData = { builtin: {}, official: {} };
+let authProviders = [];
 
 async function api(path, options = {}) {
   const res = await fetch(path, {
@@ -25,7 +29,34 @@ async function refresh() {
       if (dialog.open) renderModels();
     }
   }).catch(() => {});
+  try {
+    const auth = await api("/api/auth-providers");
+    authProviders = auth.providers;
+  } catch {
+    authProviders = [];
+  }
   render();
+  renderAuth();
+}
+
+function renderAuth() {
+  authSectionEl.classList.toggle("hidden", authProviders.length === 0);
+  authEmptyEl.classList.toggle("hidden", authProviders.length > 0);
+  authListEl.innerHTML = "";
+  authProviders.forEach((p) => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+      <div class="top">
+        <span class="name">${escapeHtml(p.id)}</span>
+        <span class="badge auth-type">${escapeHtml(p.type)}</span>
+      </div>
+      <div class="meta">认证类型:${escapeHtml(p.type)}${p.hasMetadata ? " · 含登录信息" : ""}</div>
+      <div class="ops">
+        <button data-auth-act="logout" data-auth-id="${escapeHtml(p.id)}" class="danger">登出</button>
+      </div>`;
+    authListEl.appendChild(card);
+  });
 }
 
 function orderedIds() {
@@ -682,6 +713,19 @@ listEl.addEventListener("click", async (e) => {
       if (!confirm(msg)) return;
       await api(`/api/providers/${id}`, { method: "DELETE" });
     }
+    await refresh();
+  } catch (err) {
+    alert(err.message);
+  }
+});
+
+authListEl.addEventListener("click", async (e) => {
+  const btn = e.target.closest("button[data-auth-act]");
+  if (!btn) return;
+  const id = btn.dataset.authId;
+  if (!confirm(`登出已登录供应商 ${id}?登出后移除其认证,重新登录可恢复。`)) return;
+  try {
+    await api(`/api/auth-providers/${encodeURIComponent(id)}/logout`, { method: "POST" });
     await refresh();
   } catch (err) {
     alert(err.message);

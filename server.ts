@@ -8,6 +8,7 @@ import { readMetadata, writeMetadata } from "./lib/metadata";
 import { readConfig, writeConfig } from "./lib/config-store";
 import { resolveConfigPaths } from "./lib/config-path";
 import { mergeOfficialEntries, readOfficialVariants, writeOfficialVariants } from "./lib/variants-store";
+import { listAuthProviders, removeAuthProvider } from "./lib/auth-store";
 
 const paths = resolveConfigPaths();
 const PORT = Number(process.env.PORT ?? 4173);
@@ -63,6 +64,25 @@ const server = Bun.serve({
       } catch (e) {
         const err = e as Error & { code?: string };
         return fail(err.code === "NO_CONFIG" ? 404 : 500, err.message);
+      }
+    }
+
+    if (method === "GET" && pathname === "/api/auth-providers") {
+      return ok({
+        providers: listAuthProviders(paths.authFile),
+        authFile: paths.authFile,
+      });
+    }
+
+    const authLogoutMatch = pathname.match(/^\/api\/auth-providers\/([^/]+)\/logout$/);
+    if (method === "POST" && authLogoutMatch) {
+      try {
+        // pathname 是百分号编码形式,中文等非 ASCII 供应商 id 必须解码后才能匹配 auth.json 条目
+        const authId = decodeURIComponent(authLogoutMatch[1]);
+        removeAuthProvider(paths.authFile, authId);
+        return ok({ id: authId });
+      } catch (e) {
+        return fail(404, (e as Error).message);
       }
     }
 

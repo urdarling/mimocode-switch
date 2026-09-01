@@ -6,6 +6,7 @@ export interface ConfigPaths {
   configFile: string;
   metadataFile: string;
   backupDir: string;
+  authFile: string;
 }
 
 // mimocode 的配置文件候选顺序(与源码 config.ts 的 globalConfigFile 一致)
@@ -24,16 +25,20 @@ function pickConfigFile(dir: string): string {
 // - 否则用 XDG 默认: ~/.config/mimocode(Windows 也如此,mimocode 不遵循 %LOCALAPPDATA%)
 export function resolveConfigPaths(env: NodeJS.ProcessEnv = process.env): ConfigPaths {
   let configDir: string;
+  let dataDir: string;
   const mimoHome = env.MIMOCODE_HOME;
   if (mimoHome) {
     configDir = join(mimoHome, "config");
+    dataDir = join(mimoHome, "data");
   } else {
     const home = env.HOME || env.USERPROFILE || homedir();
     configDir = join(home, ".config", "mimocode");
+    dataDir = join(home, ".local", "share", "mimocode");
   }
   return {
     configFile: pickConfigFile(configDir),
     metadataFile: join(configDir, "mimocode-ui.json"),
     backupDir: join(configDir, "backups"),
+    authFile: join(dataDir, "auth.json"),
   };
 }
