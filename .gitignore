@@ -3,3 +3,9 @@ test/.tmp/
 
 # 本地 mimo 工作区(插件依赖与 dream/distill 临时文件)
 .mimocode/
+
+# 变体库数据:mimo.json 由提取脚本生成(可随时重跑);official.json 为本机手动维护数据,不入库
+data/variants/
+
+# 会话导出文件
+session-*.md
