@@ -773,6 +773,9 @@ authListEl.addEventListener("click", async (e) => {
 $("#btn-theme").onclick = toggleTheme;
 updateThemeIcon();
 
+$("#btn-lang").onclick = () => setLang(getLang() === "zh" ? "en" : "zh");
+applyI18nStatic();
+
 refresh().catch((e) => {
   if (e.message.includes("未找到")) {
     listEl.innerHTML = `<p class="empty">未找到 mimocode.jsonc,请先运行 mimocode 生成配置,或设置 MIMOCODE_HOME 环境变量。</p>`;

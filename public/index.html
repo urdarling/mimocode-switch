@@ -9,20 +9,21 @@
 </head>
 <body>
   <header>
-    <h1>mimocode 供应商管理</h1>
+    <h1 data-i18n="hdr.title">mimocode 供应商管理</h1>
     <span id="config-path" class="path"></span>
-    <button id="btn-theme" class="secondary hdr-btn" aria-label="切换主题"></button>
-    <button id="btn-variants" class="secondary">变体库</button>
-    <button id="btn-add" class="primary">+ 添加供应商</button>
+    <button id="btn-theme" class="secondary hdr-btn" data-i18n-title="hdr.theme" aria-label="切换主题"></button>
+    <button id="btn-lang" class="secondary" data-i18n="hdr.lang">中/EN</button>
+    <button id="btn-variants" class="secondary" data-i18n="hdr.variants">变体库</button>
+    <button id="btn-add" class="primary" data-i18n="hdr.add">+ 添加供应商</button>
   </header>
   <main>
     <div id="list" class="cards"></div>
-    <p id="empty" class="empty hidden">暂无供应商,点击右上角添加。</p>
+    <p id="empty" class="empty hidden" data-i18n="empty.list">暂无供应商,点击右上角添加。</p>
     <section id="auth-section" class="auth-section hidden">
-      <h2 class="section-title">已登录供应商</h2>
-      <p class="section-hint">认证信息存于 auth.json,登出后重新登录可恢复。注意:mimocode 内置目录的供应商(如 xiaomi)即使登出也仍会显示在模型列表中,需在 mimocode.jsonc 的 disabled_providers 中禁用。</p>
+      <h2 class="section-title" data-i18n="auth.title">已登录供应商</h2>
+      <p class="section-hint" data-i18n="auth.hint">认证信息存于 auth.json,登出后重新登录可恢复。注意:mimocode 内置目录的供应商(如 xiaomi)即使登出也仍会显示在模型列表中,需在 mimocode.jsonc 的 disabled_providers 中禁用。</p>
       <div id="auth-list" class="cards"></div>
-      <p id="auth-empty" class="empty hidden">暂无已登录的供应商。</p>
+      <p id="auth-empty" class="empty hidden" data-i18n="auth.empty">暂无已登录的供应商。</p>
     </section>
   </main>
 
@@ -34,79 +35,88 @@
       </header>
       <div class="dlg-body">
         <input type="hidden" id="f-original-id">
-        <label>供应商标识 <input id="f-id" required pattern="[a-z0-9-]+" placeholder="my-provider"></label>
-        <label>名称 <input id="f-name" required placeholder="例如:某中转站"></label>
-        <label>API Key <input id="f-apiKey" required placeholder="sk-..."></label>
-        <label>Base URL <input id="f-baseURL" required placeholder="https://api.example.com/v1"></label>
-        <label>备注 <input id="f-note" placeholder="可选"></label>
-        <label>官网链接 <input id="f-link" type="url" placeholder="可选 https://..."></label>
-        <label class="checkbox"><input type="checkbox" id="f-default"> 设为默认供应商</label>
+        <label><span data-i18n="form.id">供应商标识</span> <input id="f-id" required pattern="[a-z0-9-]+" placeholder="my-provider"></label>
+        <label><span data-i18n="form.name">名称</span> <input id="f-name" required data-i18n-ph="form.namePh" placeholder="例如:某中转站"></label>
+        <label><span data-i18n="form.apiKey">API Key</span> <input id="f-apiKey" required placeholder="sk-..."></label>
+        <label><span data-i18n="form.baseURL">Base URL</span> <input id="f-baseURL" required placeholder="https://api.example.com/v1"></label>
+        <label><span data-i18n="form.note">备注</span> <input id="f-note" data-i18n-ph="form.notePh" placeholder="可选"></label>
+        <label><span data-i18n="form.link">官网链接</span> <input id="f-link" type="url" data-i18n-ph="form.linkPh" placeholder="可选 https://..."></label>
+        <label class="checkbox"><input type="checkbox" id="f-default"> <span data-i18n="form.setDefault">设为默认供应商</span></label>
         <label id="default-model-row" hidden>
-          <span>默认模型</span>
+          <span data-i18n="form.defaultModel">默认模型</span>
           <select id="f-default-model"></select>
         </label>
         <fieldset>
-          <legend>模型配置</legend>
+          <legend data-i18n="form.modelsLegend">模型配置</legend>
           <div id="models" class="model-table"></div>
           <div class="row">
-            <input id="f-model-new" placeholder="模型 id,如 deepseek-v4-flash">
-            <button type="button" id="btn-add-model">添加模型</button>
-            <button type="button" id="btn-fetch-models">获取模型</button>
+            <input id="f-model-new" data-i18n-ph="form.modelNewPh" placeholder="模型 id,如 deepseek-v4-flash">
+            <button type="button" id="btn-add-model" data-i18n="form.addModel">添加模型</button>
+            <button type="button" id="btn-fetch-models" data-i18n="form.fetchModels">获取模型</button>
           </div>
         </fieldset>
       </div>
       <footer class="dlg-foot">
-        <button type="button" id="btn-cancel" class="secondary">取消</button>
-        <button type="submit" class="primary">保存</button>
+        <button type="button" id="btn-cancel" class="secondary" data-i18n="dlg.cancel">取消</button>
+        <button type="submit" class="primary" data-i18n="dlg.save">保存</button>
       </footer>
     </form>
   </dialog>
 
   <dialog id="variants-dialog" aria-labelledby="variants-title">
     <header class="dlg-head">
-      <h2 id="variants-title">官方变体库</h2>
+      <h2 id="variants-title" data-i18n="vb.title">官方变体库</h2>
       <button type="button" id="vb-close" class="icon-btn" aria-label="关闭">×</button>
     </header>
     <div class="dlg-body">
       <div id="vb-form-wrap" class="hidden">
         <form id="vb-form" class="vb-form">
-          <label>模型 ID <input id="vb-id" required pattern="[a-zA-Z0-9._:+-]+" placeholder="gpt-5.6-luna"></label>
-          <label>显示名 <input id="vb-name" placeholder="可选"></label>
-          <label>变体列表(逗号分隔) <input id="vb-variants" required placeholder="low, medium, high, xhigh, max"></label>
-          <label>上下文 <input id="vb-limit-context" inputmode="numeric" placeholder="可选,如 200000"></label>
-          <label>输出 <input id="vb-limit-output" inputmode="numeric" placeholder="可选,如 64000"></label>
-          <label class="vb-modalities">模态
+          <label><span data-i18n="vb.id">模型 ID</span> <input id="vb-id" required pattern="[a-zA-Z0-9._:+-]+" placeholder="gpt-5.6-luna"></label>
+          <label><span data-i18n="vb.name">显示名</span> <input id="vb-name" data-i18n-ph="vb.namePh" placeholder="可选"></label>
+          <label><span data-i18n="vb.variants">变体列表(逗号分隔)</span> <input id="vb-variants" required data-i18n-ph="vb.variantsPh" placeholder="low, medium, high, xhigh, max"></label>
+          <label><span data-i18n="vb.ctx">上下文</span> <input id="vb-limit-context" inputmode="numeric" data-i18n-ph="vb.ctxPh" placeholder="可选,如 200000"></label>
+          <label><span data-i18n="vb.out">输出</span> <input id="vb-limit-output" inputmode="numeric" data-i18n-ph="vb.outPh" placeholder="可选,如 64000"></label>
+          <label class="vb-modalities"><span data-i18n="vb.modalities">模态</span>
             <span><input type="checkbox" data-vbmod="text" checked disabled> text</span>
             <span><input type="checkbox" data-vbmod="image"> image</span>
             <span><input type="checkbox" data-vbmod="audio"> audio</span>
             <span><input type="checkbox" data-vbmod="video"> video</span>
             <span><input type="checkbox" data-vbmod="pdf"> pdf</span>
           </label>
-          <label>推理
+          <label><span data-i18n="vb.reasoning">推理</span>
             <select id="vb-reasoning">
-              <option value="">未设置</option>
-              <option value="true">支持</option>
-              <option value="false">不支持</option>
+              <option value="" data-i18n="m.rsUnset">未设置</option>
+              <option value="true" data-i18n="m.rsYes">支持</option>
+              <option value="false" data-i18n="m.rsNo">不支持</option>
             </select>
           </label>
-          <label>来源 <input id="vb-source" placeholder="文档链接或说明"></label>
+          <label><span data-i18n="vb.source">来源</span> <input id="vb-source" data-i18n-ph="vb.sourcePh" placeholder="文档链接或说明"></label>
           <div class="vb-form-actions">
-            <button type="button" id="vb-form-cancel" class="secondary">取消</button>
-            <button type="submit" class="primary">保存</button>
+            <button type="button" id="vb-form-cancel" class="secondary" data-i18n="dlg.cancel">取消</button>
+            <button type="submit" class="primary" data-i18n="dlg.save">保存</button>
           </div>
         </form>
       </div>
       <div class="vb-toolbar">
-        <span class="vb-hint" id="vb-hint">手动维护,查官方文档确认支持哪些思考强度后录入</span>
+        <span class="vb-hint" id="vb-hint" data-i18n="vb.hint">手动维护,查官方文档确认支持哪些思考强度后录入</span>
         <div class="vb-ops">
-          <button id="vb-extract" class="secondary" title="mimo 升级后点击,重新提取内置目录(mimo.json)">重新提取内置目录</button>
-          <button id="vb-add" class="secondary">+ 新增条目</button>
+          <button id="vb-extract" class="secondary" data-i18n="vb.extract" data-i18n-title="vb.extractTitle" title="mimo 升级后点击,重新提取内置目录(mimo.json)">重新提取内置目录</button>
+          <button id="vb-add" class="secondary" data-i18n="vb.add">+ 新增条目</button>
         </div>
       </div>
       <div id="vb-list"></div>
     </div>
   </dialog>
 
+  <dialog id="confirm-dialog" class="confirm">
+    <div class="dlg-body confirm-msg" id="confirm-msg"></div>
+    <footer class="dlg-foot">
+      <button type="button" id="confirm-cancel" class="secondary" data-i18n="dlg.cancel">取消</button>
+      <button type="button" id="confirm-ok" class="danger-solid" data-i18n="dlg.confirm">确认</button>
+    </footer>
+  </dialog>
+
+  <script src="/i18n.js"></script>
   <script src="/app.js"></script>
 </body>
 </html>
