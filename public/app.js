@@ -1,4 +1,27 @@
 const $ = (sel) => document.querySelector(sel);
+
+// ---- 图标(12px 内联 SVG,currentColor) ----
+const ICONS = {
+  sun: '<svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="3"/><path d="M8 1.5v1.6M8 12.9v1.6M1.5 8h1.6M12.9 8h1.6M3.4 3.4l1.1 1.1M11.5 11.5l1.1 1.1M12.6 3.4l-1.1 1.1M4.5 11.5l-1.1 1.1"/></svg>',
+  moon: '<svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13.5 9.5A5.5 5.5 0 0 1 6.5 2.5a5.5 5.5 0 1 0 7 7Z"/></svg>',
+  edit: '<svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11.3 2.7a1.4 1.4 0 0 1 2 2L5 13H3v-2l8.3-8.3Z"/></svg>',
+  copy: '<svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 5.5v-2A1.5 1.5 0 0 0 9 2H3.5A1.5 1.5 0 0 0 2 3.5V9a1.5 1.5 0 0 0 1.5 1.5h2"/></svg>',
+};
+
+// ---- 主题切换(data-theme 契约:dark|light,localStorage ui-theme) ----
+function currentTheme() {
+  return document.documentElement.dataset.theme === "light" ? "light" : "dark";
+}
+function updateThemeIcon() {
+  const btn = $("#btn-theme");
+  if (btn) btn.innerHTML = currentTheme() === "dark" ? ICONS.sun : ICONS.moon;
+}
+function toggleTheme() {
+  const next = currentTheme() === "dark" ? "light" : "dark";
+  document.documentElement.dataset.theme = next;
+  localStorage.setItem("ui-theme", next);
+  updateThemeIcon();
+}
 const listEl = $("#list");
 const emptyEl = $("#empty");
 const authListEl = $("#auth-list");
@@ -746,6 +769,9 @@ authListEl.addEventListener("click", async (e) => {
     alert(err.message);
   }
 });
+
+$("#btn-theme").onclick = toggleTheme;
+updateThemeIcon();
 
 refresh().catch((e) => {
   if (e.message.includes("未找到")) {

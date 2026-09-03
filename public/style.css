@@ -1,22 +1,56 @@
-/* mimocode 供应商管理 — 深色管理工具 UI(零依赖,原生 CSS) */
+/* mimocode 供应商管理 — 石墨中性双主题(零依赖,原生 CSS) */
 :root {
-  --bg: #0a0d13;
-  --card: #10151d;
-  --card-hover: #141a24;
-  --border: #1d2430;
-  --border-strong: #2b3547;
-  --text: #e8ecf4;
-  --muted: #8b94a8;
-  --accent: #3d6cf5;
-  --accent-hover: #4f7bf7;
-  --accent-soft: rgba(61, 108, 245, 0.13);
-  --danger: #f0525a;
-  --danger-soft: rgba(240, 82, 90, 0.12);
+  /* 深色为默认主题(无 JS 时也可用) */
+  --bg: #0f1112;
+  --card: #15181b;
+  --card-hover: #1a1d20;
+  --border: #23272b;
+  --border-strong: #31363b;
+  --text: #e8eaec;
+  --muted: #767d85;
+  --accent: #5e6ad2;
+  --accent-hover: #6f7bd9;
+  --accent-soft: rgba(94, 106, 210, 0.14);
+  --accent-text: #c0c6ff;
+  --danger: #eb5757;
+  --danger-soft: rgba(235, 87, 87, 0.12);
+  --success: #4cb782;
+  --btn-bg: #23272b;
+  --btn-hover: #2d3239;
+  --primary-bg: #e8eaec;
+  --primary-text: #15181b;
+  --primary-hover: #ffffff;
+  --backdrop: rgba(2, 4, 8, 0.55);
+  --shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+  --shadow-sm: none;
   --radius: 10px;
   --radius-sm: 6px;
-  --shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
   --font: system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: "SF Mono", "Cascadia Code", Consolas, monospace;
+}
+:root[data-theme="light"] {
+  --bg: #f6f7f8;
+  --card: #ffffff;
+  --card-hover: #f0f1f3;
+  --border: #e3e5e8;
+  --border-strong: #d3d7db;
+  --text: #1b1e21;
+  --muted: #7d858d;
+  --accent: #5e6ad2;
+  --accent-hover: #4f5cc4;
+  --accent-soft: rgba(94, 106, 210, 0.09);
+  --accent-text: #4550b8;
+  --danger: #c73737;
+  --danger-soft: rgba(199, 55, 55, 0.08);
+  --success: #1f8a52;
+  --btn-bg: #eceef0;
+  --btn-hover: #dfe2e5;
+  --primary-bg: #1b1e21;
+  --primary-text: #ffffff;
+  --primary-hover: #363b40;
+  --backdrop: rgba(20, 24, 30, 0.28);
+  --shadow: 0 12px 32px rgba(20, 24, 30, 0.14);
+  --shadow-sm: 0 1px 2px rgba(20, 24, 30, 0.05);
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; }
