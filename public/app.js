@@ -23,12 +23,7 @@ async function refresh() {
   const data = await api("/api/config");
   state = data;
   $("#config-path").textContent = data.configFile;
-  fetch("/api/variants").then((r) => r.json()).then((d) => {
-    if (d?.ok && d.data) {
-      variantData = d.data;
-      if (dialog.open) renderModels();
-    }
-  }).catch(() => {});
+  syncVariantData().catch(() => {});
   try {
     const auth = await api("/api/auth-providers");
     authProviders = auth.providers;
@@ -117,6 +112,8 @@ function render() {
       const ids = orderedIds();
       const fromIdx = ids.indexOf(from);
       const toIdx = ids.indexOf(id);
+      // 外部拖入(非卡片)时 fromIdx 为 -1,splice(-1,1) 会误删末位,必须拦截
+      if (fromIdx === -1 || toIdx === -1 || fromIdx === toIdx) return;
       ids.splice(fromIdx, 1);
       ids.splice(toIdx, 0, from);
       api("/api/order", { method: "PUT", body: JSON.stringify({ ids }) }).then(refresh);
@@ -415,17 +412,18 @@ $("#f-default").addEventListener("change", syncDefaultModelUI);
 const vbDialog = $("#variants-dialog");
 let vbEntries = {};
 
+// 变体数据统一刷新:/api/variants 只请求一次,同步 variantData 与 vbEntries 两处状态
 async function syncVariantData() {
   const d = await api("/api/variants");
   variantData = d;
+  const { "//": _comment, ...rest } = d.official;
+  vbEntries = rest;
+  if (vbDialog.open) renderVbList();
   if (dialog.open) renderModels();
 }
 
 async function vbRefresh() {
-  const d = await api("/api/variants");
-  const { "//": _comment, ...rest } = d.official;
-  vbEntries = rest;
-  renderVbList();
+  await syncVariantData();
 }
 
 function renderVbList() {
@@ -527,7 +525,6 @@ $("#vb-extract").onclick = async () => {
   try {
     const d = await api("/api/variants/extract", { method: "POST" });
     hint.textContent = d.output.split("\n").pop() ?? "提取完成";
-    await vbRefresh();
     await syncVariantData();
   } catch (err) {
     alert("提取失败: " + err.message);
@@ -576,7 +573,6 @@ $("#vb-form").addEventListener("submit", async (e) => {
   try {
     await api("/api/variants/official", { method: "PUT", body: JSON.stringify(next) });
     closeVbForm();
-    await vbRefresh();
     await syncVariantData();
   } catch (err) {
     alert(err.message);
@@ -594,7 +590,6 @@ $("#vb-list").addEventListener("click", async (e) => {
     try {
       // 增量删除:发 null 标记,服务端只删该条目,文件内其他条目保留
       await api("/api/variants/official", { method: "PUT", body: JSON.stringify({ [id]: null }) });
-      await vbRefresh();
       await syncVariantData();
     } catch (err) {
       alert(err.message);
@@ -605,7 +600,11 @@ $("#vb-list").addEventListener("click", async (e) => {
 $("#btn-add-model").onclick = () => {
   const input = $("#f-model-new");
   const id = input.value.trim();
-  if (id && !models[id]) { models[id] = { name: id, ...prefillMeta(id), ...(prefillVariants(id) ? { variants: prefillVariants(id) } : {}) }; renderModels(); }
+  if (id && !models[id]) {
+    const pv = prefillVariants(id);
+    models[id] = { name: id, ...prefillMeta(id), ...(pv ? { variants: pv } : {}) };
+    renderModels();
+  }
   input.value = "";
 };
 
@@ -617,7 +616,11 @@ $("#btn-fetch-models").onclick = async () => {
       method: "POST",
       body: JSON.stringify({ baseURL: $("#f-baseURL").value, apiKey: $("#f-apiKey").value }),
     });
-    data.models.forEach((m) => { models[m] = models[m] ?? { name: m, ...prefillMeta(m), ...(prefillVariants(m) ? { variants: prefillVariants(m) } : {}) }; });
+    data.models.forEach((m) => {
+      if (models[m]) return;
+      const pv = prefillVariants(m);
+      models[m] = { name: m, ...prefillMeta(m), ...(pv ? { variants: pv } : {}) };
+    });
     renderModels();
   } catch (e) {
     alert("获取模型失败: " + e.message);

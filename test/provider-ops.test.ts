@@ -101,6 +101,12 @@ describe("removeProvider", () => {
     expect(r.provider!.a).toBeUndefined();
     expect(r.model).toBeUndefined();
   });
+  test("删除默认供应商后剩余供应商无模型时 model 清空(不写悬空 id/ 指针)", () => {
+    const c = addProvider(base(), "b", { name: "B", baseURL: "x", apiKey: "k" }); // b 无 models
+    const r = removeProvider(c, "a"); // a 是默认
+    expect(r.provider!.a).toBeUndefined();
+    expect(r.model).toBeUndefined();
+  });
 });
 
 describe("activateProvider", () => {

@@ -19,9 +19,9 @@ mimocode 供应商管理工具 —— 带 UI 的 mimocode 第三方供应商管�
 
 ## 关键约束
 
-- **配置路径**(`lib/config-path.ts`,与 mimocode 源码一致):`MIMOCODE_HOME` 设置时为 `$MIMOCODE_HOME/config`,否则一律 `~/.config/mimocode` —— Windows 也不走 `%LOCALAPPDATA%`(README 此处理旧,以代码为准)。候选文件名按序:`mimocode.jsonc` → `mimocode.json` → `config.json`
+- **配置路径**(`lib/config-path.ts`,与 mimocode 源码一致):`MIMOCODE_HOME` 设置时为 `$MIMOCODE_HOME/config`,否则一律 `~/.config/mimocode` —— Windows 也不走 `%LOCALAPPDATA%`。候选文件名按序:`mimocode.jsonc` → `mimocode.json` → `config.json`
 - **写回会剥离 JSONC 注释**并格式化为标准 JSON,原子写入(tmp+rename),同时备份到 `<config目录>/backups/` 保留最近 10 份 —— 经 UI/API 编辑后 mimocode.jsonc 的注释会丢失
 - 供应商 id 必须匹配 `^[a-z0-9-]+$`(`lib/provider-ops.ts`)
-- **additive 语义**:默认供应商由 `model: "<id>/<modelId>"` 指针表示(`isDefault = model.startsWith(id + "/")`),没有独立的激活标志。删除默认供应商时 `model` 自动重定向到剩余第一个,删光则清空
+- **additive 语义**:默认供应商由 `model: "<id>/<modelId>"` 指针表示(`isDefault = model.startsWith(id + "/")`),没有独立的激活标志。删除默认供应商时 `model` 自动重定向到剩余第一个的首个模型(该供应商无模型或删光则清空,不写悬空 `"id/"`)
 - `mimocode-ui.json`(与 mimocode.jsonc 同目录):字段为 `order` / `notes` / `links`
 - API Key 明文存于 mimocode.jsonc;`/api/fetch-models` 仅代理供应商 `/models` 端点(15s 超时),不落盘

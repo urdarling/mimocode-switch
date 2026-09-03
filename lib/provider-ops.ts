@@ -97,7 +97,8 @@ export function removeProvider(config: ConfigData, id: string): ConfigData {
     } else {
       const fallback = remaining[0];
       const fallbackModels = Object.keys(next[fallback]?.models ?? {});
-      model = fallbackModels.length > 0 ? `${fallback}/${fallbackModels[0]}` : `${fallback}/`;
+      // 兜底供应商无模型时清空指针——写 "id/" 会让 mimocode 读到空模型 id
+      model = fallbackModels.length > 0 ? `${fallback}/${fallbackModels[0]}` : undefined;
     }
   }
   return { ...config, provider: next, model };

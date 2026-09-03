@@ -1,5 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
-import { join, normalize } from "node:path";
+import { join } from "node:path";
+import { resolveStaticPath } from "./lib/static-path";
 import {
   activateProvider, addProvider, duplicateProvider,
   listProviders, removeProvider, updateProvider,
@@ -288,9 +289,9 @@ const server = Bun.serve({
     }
 
     // 静态资源
-    let filePath = normalize(join(PUBLIC_DIR, pathname === "/" ? "index.html" : pathname));
-    if (!filePath.startsWith(PUBLIC_DIR)) return fail(403, "forbidden");
-    if (!existsSync(filePath) || !filePath.startsWith(PUBLIC_DIR)) return fail(404, "not found");
+    const filePath = resolveStaticPath(PUBLIC_DIR, pathname);
+    if (!filePath) return fail(403, "forbidden");
+    if (!existsSync(filePath)) return fail(404, "not found");
     const ext = filePath.split(".").pop()?.toLowerCase() ?? "";
     const mime: Record<string, string> = {
       html: "text/html; charset=utf-8",
