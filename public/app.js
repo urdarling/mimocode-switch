@@ -38,7 +38,7 @@ async function api(path, options = {}) {
     ...options,
   });
   const body = await res.json();
-  if (!body.ok) throw new Error(body.error || "请求失败");
+  if (!body.ok) throw new Error(body.error || t("err.generic"));
   return body.data;
 }
 
@@ -69,9 +69,9 @@ function renderAuth() {
         <span class="name">${escapeHtml(p.id)}</span>
         <span class="badge auth-type">${escapeHtml(p.type)}</span>
       </div>
-      <div class="meta">认证类型:${escapeHtml(p.type)}${p.hasMetadata ? " · 含登录信息" : ""}</div>
+      <div class="meta">${t("auth.type", { type: p.type })}${p.hasMetadata ? t("auth.hasMeta") : ""}</div>
       <div class="ops">
-        <button data-auth-act="logout" data-auth-id="${escapeHtml(p.id)}" class="danger">登出</button>
+        <button data-auth-act="logout" data-auth-id="${escapeHtml(p.id)}" class="danger">${t("auth.logout")}</button>
       </div>`;
     authListEl.appendChild(card);
   });
@@ -102,15 +102,15 @@ function render() {
       <div class="top">
         <span class="drag">≡</span>
         <span class="name">${escapeHtml(p.config.name ?? id)}</span>
-        ${p.isDefault ? '<span class="badge">默认</span>' : ""}
+        ${p.isDefault ? `<span class="badge">${t("card.default")}</span>` : ""}
       </div>
       <div class="meta">${escapeHtml(p.config.options?.baseURL ?? "")}</div>
       ${state.metadata.notes?.[id] ? `<div class="meta">📝 ${escapeHtml(state.metadata.notes[id])}</div>` : ""}
-      <div class="meta">${modelKeys.length} 个模型</div>
+      <div class="meta">${t("card.models", { n: modelKeys.length })}</div>
       <div class="ops">
         ${modelKeys.length > 0
           ? `<span class="dropdown">
-              <button type="button" class="dd-btn${p.isDefault ? " dd-current" : ""}" data-dd="${id}" aria-haspopup="menu" aria-expanded="false">${p.isDefault ? `<span class="dd-label">默认模型</span><span class="dd-value" title="${escapeHtml(activeMid)}">${escapeHtml(activeMid)}</span>` : "设为默认"} <span class="caret">▾</span></button>
+              <button type="button" class="dd-btn${p.isDefault ? " dd-current" : ""}" data-dd="${id}" aria-haspopup="menu" aria-expanded="false">${p.isDefault ? `<span class="dd-label">${t("card.defaultModel")}</span><span class="dd-value" title="${escapeHtml(activeMid)}">${escapeHtml(activeMid)}</span>` : t("card.setDefault")} <span class="caret">▾</span></button>
               <div class="dd-menu hidden" data-ddmenu="${id}" role="menu">
                 ${modelKeys.map((m) => {
                   const cfg = p.config.models?.[m];
@@ -122,10 +122,10 @@ function render() {
             </span>`
           : p.isDefault
             ? ""
-            : `<button data-act="activate" data-id="${id}">设为默认</button>`}
-        <button data-act="edit" data-id="${id}">编辑</button>
-        <button data-act="dup" data-id="${id}">复制</button>
-        <button data-act="del" data-id="${id}" class="danger">删除</button>
+            : `<button data-act="activate" data-id="${id}">${t("card.setDefault")}</button>`}
+        <button class="ghost" data-act="edit" data-id="${id}">${ICONS.edit}${t("card.edit")}</button>
+        <button class="ghost" data-act="dup" data-id="${id}">${ICONS.copy}${t("card.dup")}</button>
+        <button data-act="del" data-id="${id}" class="danger">${t("card.del")}</button>
       </div>`;
     card.addEventListener("dragstart", (e) => { e.dataTransfer.setData("text/plain", id); });
     card.addEventListener("dragover", (e) => e.preventDefault());
@@ -139,7 +139,8 @@ function render() {
       if (fromIdx === -1 || toIdx === -1 || fromIdx === toIdx) return;
       ids.splice(fromIdx, 1);
       ids.splice(toIdx, 0, from);
-      api("/api/order", { method: "PUT", body: JSON.stringify({ ids }) }).then(refresh);
+      api("/api/order", { method: "PUT", body: JSON.stringify({ ids }) })
+        .then(() => { toast(t("toast.ordered")); refresh(); });
     });
     listEl.appendChild(card);
   });
@@ -147,6 +148,43 @@ function render() {
 
 function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+// ---- Toast(替代 alert):type "success"(默认)| "error" ----
+function toast(msg, type = "success") {
+  let box = $("#toasts");
+  if (!box) {
+    box = document.createElement("div");
+    box.id = "toasts";
+    document.body.appendChild(box);
+  }
+  const el = document.createElement("div");
+  el.className = "toast" + (type === "error" ? " error" : "");
+  el.textContent = msg;
+  const dismiss = () => { el.classList.add("out"); setTimeout(() => el.remove(), 200); };
+  el.onclick = dismiss;
+  setTimeout(dismiss, 3500);
+  box.appendChild(el);
+}
+
+// ---- 确认框(替代 confirm):Promise<boolean>,Esc/取消 = false ----
+function confirmDialog(message) {
+  const dlg = $("#confirm-dialog");
+  $("#confirm-msg").textContent = message;
+  return new Promise((resolve) => {
+    const ok = $("#confirm-ok");
+    const cancel = $("#confirm-cancel");
+    const done = (val) => {
+      ok.onclick = cancel.onclick = null;
+      dlg.oncancel = null;
+      dlg.close();
+      resolve(val);
+    };
+    ok.onclick = () => done(true);
+    cancel.onclick = () => done(false);
+    dlg.oncancel = () => done(false);
+    dlg.showModal();
+  });
 }
 
 // ---- 表单 ----
@@ -159,7 +197,7 @@ function openForm(provider) {
   editingId = provider?.id ?? null;
   models = provider?.config?.models ? JSON.parse(JSON.stringify(provider.config.models)) : {};
   backfillVariantParams();
-  $("#form-title").textContent = editingId ? "编辑供应商" : "添加供应商";
+  $("#form-title").textContent = editingId ? t("form.edit") : t("form.add");
   $("#f-original-id").value = provider?.id ?? "";
   $("#f-id").value = provider?.id ?? "";
   $("#f-id").disabled = !!provider;
@@ -263,15 +301,15 @@ function renderVariantsInto(container, modelId) {
   };
 
   const groups = [];
-  if (b.length) groups.push(group("内置变体", b));
-  if (o.length) groups.push(group("官方变体", o));
+  if (b.length) groups.push(group(t("v.builtin"), b));
+  if (o.length) groups.push(group(t("v.official"), o));
 
   const custom = selected.filter((v) => !known.has(v));
   const cWrap = document.createElement("div");
   cWrap.className = "vg";
   const cH = document.createElement("div");
   cH.className = "vg-label";
-  cH.textContent = "自定义";
+  cH.textContent = t("v.custom");
   cWrap.appendChild(cH);
   const chips = document.createElement("div");
   chips.className = "chips";
@@ -281,11 +319,11 @@ function renderVariantsInto(container, modelId) {
   addRow.className = "chip-add-row";
   const add = document.createElement("input");
   add.className = "chip-add";
-  add.placeholder = "自定义变体名";
+  add.placeholder = t("v.customPh");
   const addBtn = document.createElement("button");
   addBtn.type = "button";
   addBtn.className = "chip-add-btn";
-  addBtn.textContent = "添加";
+  addBtn.textContent = t("v.add");
   const doAdd = () => {
     const v = add.value.trim();
     if (v && !models[modelId].variants?.[v]) { models[modelId].variants ??= {}; models[modelId].variants[v] = {}; }
@@ -305,11 +343,11 @@ function renderVariantsInto(container, modelId) {
   if (b.length === 0 && o.length === 0 && custom.length === 0) {
     const note = document.createElement("div");
     note.className = "variant-empty";
-    note.appendChild(document.createTextNode("无内置/官方记录,可自定义添加 · "));
+    note.appendChild(document.createTextNode(t("v.empty")));
     const link = document.createElement("button");
     link.type = "button";
     link.className = "link-btn";
-    link.textContent = "管理官方库";
+    link.textContent = t("v.manage");
     link.onclick = () => { vbRefresh(); vbDialog.showModal(); };
     note.appendChild(link);
     container.appendChild(note);
@@ -319,7 +357,7 @@ function renderVariantsInto(container, modelId) {
     const clear = document.createElement("button");
     clear.type = "button";
     clear.className = "chip-clear";
-    clear.textContent = "清空";
+    clear.textContent = t("v.clear");
     clear.onclick = () => { delete models[modelId].variants; renderVariantsInto(container, modelId); };
     container.appendChild(clear);
   }
@@ -373,11 +411,11 @@ function renderModels() {
       <div class="m-id" title="${escapeHtml(id)}">${escapeHtml(id)}</div>
       <div class="m-name" title="${escapeHtml(m?.name ?? "")}">${escapeHtml(m?.name ?? "")}</div>
       <div class="m-limit">
-        <span>上下文</span><input class="limit-input" data-lk="context" inputmode="numeric" value="${ctx}" placeholder="?">
-        <span>输出</span><input class="limit-input" data-lk="output" inputmode="numeric" value="${out}" placeholder="?">
+        <span>${t("m.limitCtx")}</span><input class="limit-input" data-lk="context" inputmode="numeric" value="${ctx}" placeholder="?">
+        <span>${t("m.limitOut")}</span><input class="limit-input" data-lk="output" inputmode="numeric" value="${out}" placeholder="?">
       </div>
       <div class="m-modalities">
-        <span>模态</span>
+        <span>${t("m.modalities")}</span>
         <span><input type="checkbox" data-mod="text" checked disabled> text</span>
         <span><input type="checkbox" data-mod="image" ${modIn.includes("image") ? "checked" : ""}> image</span>
         <span><input type="checkbox" data-mod="audio" ${modIn.includes("audio") ? "checked" : ""}> audio</span>
@@ -385,11 +423,11 @@ function renderModels() {
         <span><input type="checkbox" data-mod="pdf" ${modIn.includes("pdf") ? "checked" : ""}> pdf</span>
       </div>
       <div class="m-reasoning">
-        <span>推理</span>
+        <span>${t("m.reasoning")}</span>
         <select class="reasoning-select" data-rs>
-          <option value="" ${rsVal === "" ? "selected" : ""}>未设置</option>
-          <option value="true" ${rsVal === "true" ? "selected" : ""}>支持</option>
-          <option value="false" ${rsVal === "false" ? "selected" : ""}>不支持</option>
+          <option value="" ${rsVal === "" ? "selected" : ""}>${t("m.rsUnset")}</option>
+          <option value="true" ${rsVal === "true" ? "selected" : ""}>${t("m.rsYes")}</option>
+          <option value="false" ${rsVal === "false" ? "selected" : ""}>${t("m.rsNo")}</option>
         </select>
       </div>`;
     const syncLimit = () => syncLimitFromRow(id, row);
@@ -406,7 +444,7 @@ function renderModels() {
     del.type = "button";
     del.className = "icon-btn m-del";
     del.textContent = "×";
-    del.title = "删除模型";
+    del.title = t("m.delModel");
     del.onclick = () => { delete models[id]; renderModels(); };
     row.appendChild(col1);
     row.appendChild(col2);
@@ -454,7 +492,7 @@ function renderVbList() {
   list.innerHTML = "";
   const ids = Object.keys(vbEntries).sort();
   if (ids.length === 0) {
-    list.innerHTML = `<p class="empty">暂无条目,点击「+ 新增条目」录入。</p>`;
+    list.innerHTML = `<p class="empty">${t("vb.empty")}</p>`;
     return;
   }
   ids.forEach((id) => {
@@ -469,8 +507,8 @@ function renderVbList() {
     idEl.title = id;
     main.appendChild(idEl);
     const lim = e.limit;
-    const modStr = e.modalities?.input?.length > 1 ? `模态 ${e.modalities.input.join("+")}` : "";
-    const rsStr = e.reasoning === true ? "推理:支持" : e.reasoning === false ? "推理:不支持" : "";
+    const modStr = e.modalities?.input?.length > 1 ? `${t("vb.modalities")} ${e.modalities.input.join("+")}` : "";
+    const rsStr = e.reasoning === true ? `${t("vb.reasoning")}:${t("m.rsYes")}` : e.reasoning === false ? `${t("vb.reasoning")}:${t("m.rsNo")}` : "";
     const sub = document.createElement("div");
     sub.className = "vb-sub";
     sub.textContent = [e.name, lim ? `ctx ${lim.context ?? "?"} · out ${lim.output ?? "?"}` : "", modStr, rsStr, e.source, e.updated].filter(Boolean).join(" · ");
@@ -486,18 +524,18 @@ function renderVbList() {
     editBtn.type = "button";
     editBtn.dataset.vb = "edit";
     editBtn.dataset.id = id;
-    editBtn.textContent = "编辑";
+    editBtn.textContent = t("vb.edit");
     const copyBtn = document.createElement("button");
     copyBtn.type = "button";
     copyBtn.dataset.vb = "copy";
     copyBtn.dataset.id = id;
-    copyBtn.textContent = "复制";
+    copyBtn.textContent = t("vb.copy");
     const delBtn = document.createElement("button");
     delBtn.type = "button";
     delBtn.dataset.vb = "del";
     delBtn.dataset.id = id;
     delBtn.className = "danger";
-    delBtn.textContent = "删除";
+    delBtn.textContent = t("vb.del");
     ops.appendChild(editBtn);
     ops.appendChild(copyBtn);
     ops.appendChild(delBtn);
@@ -543,14 +581,14 @@ $("#vb-extract").onclick = async () => {
   const btn = $("#vb-extract");
   btn.disabled = true;
   const old = btn.textContent;
-  btn.textContent = "提取中...";
+  btn.textContent = t("vb.extracting");
   const hint = $("#vb-hint");
   try {
     const d = await api("/api/variants/extract", { method: "POST" });
     hint.textContent = d.output.split("\n").pop() ?? "提取完成";
     await syncVariantData();
   } catch (err) {
-    alert("提取失败: " + err.message);
+    toast(t("err.extract", { msg: err.message }), "error");
   }
   btn.disabled = false;
   btn.textContent = old;
@@ -560,7 +598,7 @@ $("#vb-form").addEventListener("submit", async (e) => {
   e.preventDefault();
   const id = $("#vb-id").value.trim();
   if (!id) return;
-  if (vbEntries[id] && id !== vbCopySourceId) { alert(`条目 ${id} 已存在,请换一个 ID`); return; }
+  if (vbEntries[id] && id !== vbCopySourceId) { toast(t("vb.exists", { id }), "error"); return; }
   const entry = {
     name: $("#vb-name").value.trim(),
     variants: $("#vb-variants").value.split(",").map((x) => x.trim()).filter(Boolean),
@@ -596,9 +634,10 @@ $("#vb-form").addEventListener("submit", async (e) => {
   try {
     await api("/api/variants/official", { method: "PUT", body: JSON.stringify(next) });
     closeVbForm();
+    toast(t("toast.vbSaved"));
     await syncVariantData();
   } catch (err) {
-    alert(err.message);
+    toast(err.message, "error");
   }
 });
 
@@ -609,13 +648,14 @@ $("#vb-list").addEventListener("click", async (e) => {
   if (btn.dataset.vb === "edit") { openVbForm(id); return; }
   if (btn.dataset.vb === "copy") { openVbForm(id, true); return; }
   if (btn.dataset.vb === "del") {
-    if (!confirm(`删除条目 ${id}?`)) return;
+    if (!(await confirmDialog(t("vb.delConfirm", { id })))) return;
     try {
       // 增量删除:发 null 标记,服务端只删该条目,文件内其他条目保留
       await api("/api/variants/official", { method: "PUT", body: JSON.stringify({ [id]: null }) });
+      toast(t("toast.vbDeleted"));
       await syncVariantData();
     } catch (err) {
-      alert(err.message);
+      toast(err.message, "error");
     }
   }
 });
@@ -633,7 +673,7 @@ $("#btn-add-model").onclick = () => {
 
 $("#btn-fetch-models").onclick = async () => {
   const btn = $("#btn-fetch-models");
-  btn.disabled = true; btn.textContent = "获取中...";
+  btn.disabled = true; btn.textContent = t("form.fetching");
   try {
     const data = await api("/api/fetch-models", {
       method: "POST",
@@ -646,9 +686,9 @@ $("#btn-fetch-models").onclick = async () => {
     });
     renderModels();
   } catch (e) {
-    alert("获取模型失败: " + e.message);
+    toast(t("err.fetchModels", { msg: e.message }), "error");
   }
-  btn.disabled = false; btn.textContent = "获取模型";
+  btn.disabled = false; btn.textContent = t("form.fetchModels");
 };
 
 $("#provider-form").addEventListener("submit", async (e) => {
@@ -684,10 +724,11 @@ $("#provider-form").addEventListener("submit", async (e) => {
       const modelId = $("#f-default-model").value || modelIds[0] || `${savedId}-default`;
       await api(`/api/providers/${savedId}/activate`, { method: "POST", body: JSON.stringify({ modelId }) });
     }
+    toast(t("toast.saved", { id: savedId }));
     dialog.close();
     await refresh();
   } catch (err) {
-    alert(err.message);
+    toast(err.message, "error");
   }
 });
 
@@ -722,9 +763,10 @@ listEl.addEventListener("click", async (e) => {
     closeAllDropdowns();
     try {
       await api(`/api/providers/${ddItem.dataset.dditem}/activate`, { method: "POST", body: JSON.stringify({ modelId: ddItem.dataset.model }) });
+      toast(t("toast.activated", { model: `${ddItem.dataset.dditem}/${ddItem.dataset.model}` }));
       await refresh();
     } catch (err) {
-      alert(err.message);
+      toast(err.message, "error");
     }
     return;
   }
@@ -738,22 +780,23 @@ listEl.addEventListener("click", async (e) => {
       const models = Object.keys(p.config.models ?? {});
       const modelId = models.length > 0 ? models[0] : `${id}-default`;
       await api(`/api/providers/${id}/activate`, { method: "POST", body: JSON.stringify({ modelId }) });
+      toast(t("toast.activated", { model: `${id}/${modelId}` }));
     } else if (act === "edit") {
       openForm(p);
       return;
     } else if (act === "dup") {
-      await api(`/api/providers/${id}/duplicate`, { method: "POST" });
+      const dupRes = await api(`/api/providers/${id}/duplicate`, { method: "POST" });
+      toast(t("toast.duplicated", { id: dupRes.id }));
     } else if (act === "del") {
       const isDefault = p.isDefault;
-      const msg = isDefault
-        ? `删除供应商 ${id}?这是当前默认供应商,删除后默认会自动切到其他供应商。`
-        : `删除供应商 ${id}?`;
-      if (!confirm(msg)) return;
+      const msg = isDefault ? t("card.delConfirmDefault", { id }) : t("card.delConfirm", { id });
+      if (!(await confirmDialog(msg))) return;
       await api(`/api/providers/${id}`, { method: "DELETE" });
+      toast(t("toast.deleted", { id }));
     }
     await refresh();
   } catch (err) {
-    alert(err.message);
+    toast(err.message, "error");
   }
 });
 
@@ -761,12 +804,13 @@ authListEl.addEventListener("click", async (e) => {
   const btn = e.target.closest("button[data-auth-act]");
   if (!btn) return;
   const id = btn.dataset.authId;
-  if (!confirm(`登出已登录供应商 ${id}?登出后移除其认证,重新登录可恢复。`)) return;
+  if (!(await confirmDialog(t("auth.logoutConfirm", { id })))) return;
   try {
     await api(`/api/auth-providers/${encodeURIComponent(id)}/logout`, { method: "POST" });
+    toast(t("toast.loggedOut", { id }));
     await refresh();
   } catch (err) {
-    alert(err.message);
+    toast(err.message, "error");
   }
 });
 
@@ -776,10 +820,17 @@ updateThemeIcon();
 $("#btn-lang").onclick = () => setLang(getLang() === "zh" ? "en" : "zh");
 applyI18nStatic();
 
+window.onLangChange = () => {
+  render();
+  renderAuth();
+  if (dialog.open) renderModels();
+  if (vbDialog.open) renderVbList();
+};
+
 refresh().catch((e) => {
   if (e.message.includes("未找到")) {
-    listEl.innerHTML = `<p class="empty">未找到 mimocode.jsonc,请先运行 mimocode 生成配置,或设置 MIMOCODE_HOME 环境变量。</p>`;
+    listEl.innerHTML = `<p class="empty">${t("empty.noconfig")}</p>`;
   } else {
-    alert(e.message);
+    toast(e.message, "error");
   }
 });
