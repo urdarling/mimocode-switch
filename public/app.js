@@ -410,25 +410,27 @@ function renderModels() {
     col1.innerHTML = `
       <div class="m-id" title="${escapeHtml(id)}">${escapeHtml(id)}</div>
       <div class="m-name" title="${escapeHtml(m?.name ?? "")}">${escapeHtml(m?.name ?? "")}</div>
-      <div class="m-limit">
-        <span>${t("m.limitCtx")}</span><input class="limit-input" data-lk="context" inputmode="numeric" value="${ctx}" placeholder="?">
-        <span>${t("m.limitOut")}</span><input class="limit-input" data-lk="output" inputmode="numeric" value="${out}" placeholder="?">
-      </div>
-      <div class="m-modalities">
-        <span>${t("m.modalities")}</span>
-        <span><input type="checkbox" data-mod="text" checked disabled> text</span>
-        <span><input type="checkbox" data-mod="image" ${modIn.includes("image") ? "checked" : ""}> image</span>
-        <span><input type="checkbox" data-mod="audio" ${modIn.includes("audio") ? "checked" : ""}> audio</span>
-        <span><input type="checkbox" data-mod="video" ${modIn.includes("video") ? "checked" : ""}> video</span>
-        <span><input type="checkbox" data-mod="pdf" ${modIn.includes("pdf") ? "checked" : ""}> pdf</span>
-      </div>
-      <div class="m-reasoning">
-        <span>${t("m.reasoning")}</span>
-        <select class="reasoning-select" data-rs>
-          <option value="" ${rsVal === "" ? "selected" : ""}>${t("m.rsUnset")}</option>
-          <option value="true" ${rsVal === "true" ? "selected" : ""}>${t("m.rsYes")}</option>
-          <option value="false" ${rsVal === "false" ? "selected" : ""}>${t("m.rsNo")}</option>
-        </select>
+      <div class="m-fields">
+        <span class="f-label">${t("m.limitCtx")}</span>
+        <span class="f-ctrl"><input class="limit-input" data-lk="context" inputmode="numeric" value="${ctx}" placeholder="?"></span>
+        <span class="f-label">${t("m.limitOut")}</span>
+        <span class="f-ctrl"><input class="limit-input" data-lk="output" inputmode="numeric" value="${out}" placeholder="?"></span>
+        <span class="f-label">${t("m.modalities")}</span>
+        <span class="f-ctrl f-mods">
+          <span><input type="checkbox" data-mod="text" checked disabled> text</span>
+          <span><input type="checkbox" data-mod="image" ${modIn.includes("image") ? "checked" : ""}> image</span>
+          <span><input type="checkbox" data-mod="audio" ${modIn.includes("audio") ? "checked" : ""}> audio</span>
+          <span><input type="checkbox" data-mod="video" ${modIn.includes("video") ? "checked" : ""}> video</span>
+          <span><input type="checkbox" data-mod="pdf" ${modIn.includes("pdf") ? "checked" : ""}> pdf</span>
+        </span>
+        <span class="f-label">${t("m.reasoning")}</span>
+        <span class="f-ctrl">
+          <select class="reasoning-select" data-rs>
+            <option value="" ${rsVal === "" ? "selected" : ""}>${t("m.rsUnset")}</option>
+            <option value="true" ${rsVal === "true" ? "selected" : ""}>${t("m.rsYes")}</option>
+            <option value="false" ${rsVal === "false" ? "selected" : ""}>${t("m.rsNo")}</option>
+          </select>
+        </span>
       </div>`;
     const syncLimit = () => syncLimitFromRow(id, row);
     col1.querySelector('[data-lk="context"]').addEventListener("change", syncLimit);

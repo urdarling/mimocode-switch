@@ -141,14 +141,19 @@ button.icon-btn:hover { color: var(--text); background: var(--btn-bg); }
 
 /* ---- 自定义下拉(卡片"设为默认") ---- */
 .dropdown { position: relative; display: inline-block; }
+.card .ops .dropdown { flex-basis: 100%; } /* 下拉独占一行(默认态/设为默认态统一),ops 内编辑/复制/删除保持一行对齐 */
 .dd-btn { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; }
 .dd-btn .caret { font-size: 10px; color: var(--muted); }
-.dd-current { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-text); }
+.dd-current {
+  background: var(--accent-soft); border: 0; border-radius: 999px;
+  color: var(--accent-text); padding: 3px 10px; font-size: 12px;
+}
+.dd-current:hover { background: color-mix(in srgb, var(--accent) 24%, transparent); }
 .dd-current .dd-label { color: var(--muted); font-size: 11px; }
 .dd-current .dd-value {
-  display: inline-block; max-width: 150px; min-width: 0;
+  display: inline-block; max-width: 150px; min-width: 0; flex: 0 1 auto;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  font-family: var(--mono); font-size: 12px; vertical-align: bottom;
+  font-family: var(--mono); font-size: 12px;
 }
 .dd-menu {
   position: absolute; top: calc(100% + 6px); left: 0; z-index: 30;
@@ -178,7 +183,7 @@ dialog {
   border: 1px solid var(--border-strong);
   border-radius: 12px;
   padding: 0;
-  width: 560px; max-width: 92vw;
+  width: 640px; max-width: 92vw;
   max-height: min(88vh, 680px);
   box-shadow: var(--shadow);
 }
@@ -226,10 +231,10 @@ dialog input[disabled] { opacity: 0.55; }
 /* ---- 模型配置区 ---- */
 fieldset { border: 1px solid var(--border); border-radius: var(--radius); margin: 0; padding: 12px 14px; }
 fieldset legend { font-size: 12px; color: var(--muted); padding: 0 6px; }
-.model-table { display: flex; flex-direction: column; gap: 8px; max-height: 34vh; overflow-y: auto; padding-right: 4px; }
+.model-table { display: flex; flex-direction: column; gap: 8px; } /* 不限高:滚动统一交给对话框主体,避免嵌套双滚动条 */
 .model-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr) 24px;
+  grid-template-columns: minmax(220px, 1fr) minmax(0, 1.4fr) 24px;
   gap: 10px; align-items: start;
   padding: 8px 10px;
   border: 1px solid var(--border);
@@ -238,17 +243,18 @@ fieldset legend { font-size: 12px; color: var(--muted); padding: 0 6px; }
 .model-row:hover { border-color: var(--border-strong); }
 .m-id { font-family: var(--mono); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .m-name { font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.m-limit { display: flex; align-items: center; gap: 4px; margin-top: 4px; font-size: 11px; color: var(--muted); }
+/* 模型参数:统一「标签列 + 控件列」两列网格,各行标签左对齐、输入框对齐,窄列下不再互相挤压 */
+.m-fields { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 5px 8px; margin-top: 6px; font-size: 11px; color: var(--muted); }
+.m-fields .f-label { white-space: nowrap; }
+.m-fields .f-ctrl { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; min-width: 0; }
+.m-fields .f-ctrl > span { display: inline-flex; align-items: center; gap: 1px; white-space: nowrap; }
 .limit-input {
   font: inherit; font-family: var(--mono); font-size: 11px;
-  width: 78px; background: var(--bg); color: var(--text);
+  flex: 1 1 72px; width: 72px; min-width: 0; background: var(--bg); color: var(--text);
   border: 1px solid var(--border-strong); border-radius: 4px; padding: 2px 6px;
 }
 .limit-input:focus { border-color: var(--accent); }
-.m-modalities { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-top: 4px; font-size: 11px; color: var(--muted); }
-.m-modalities span { display: inline-flex; align-items: center; gap: 1px; }
-.m-modalities input[type="checkbox"] { margin: 0; width: 11px; height: 11px; }
-.m-reasoning { display: flex; align-items: center; gap: 4px; margin-top: 4px; font-size: 11px; color: var(--muted); }
+.f-mods input[type="checkbox"] { margin: 0; width: 11px; height: 11px; }
 .reasoning-select {
   font: inherit; font-size: 11px; background: var(--bg); color: var(--text);
   border: 1px solid var(--border-strong); border-radius: 4px; padding: 2px 4px;
@@ -273,10 +279,10 @@ fieldset legend { font-size: 12px; color: var(--muted); padding: 0 6px; }
   font: inherit; font-size: 11.5px;
   background: transparent; color: var(--muted);
   border: 1px dashed var(--border-strong); border-radius: 999px;
-  padding: 3px 9px; width: 130px;
+  padding: 3px 9px; flex: 1 1 96px; width: 96px; min-width: 0;
 }
 .chip-add:focus { border-color: var(--accent); color: var(--text); }
-.chip-add-btn { padding: 3px 10px; font-size: 11.5px; border-radius: 999px; }
+.chip-add-btn { padding: 3px 10px; font-size: 11.5px; border-radius: 999px; white-space: nowrap; flex: 0 0 auto; }
 .chip-clear {
   font: inherit; font-size: 11px;
   background: transparent; color: var(--muted);
@@ -324,7 +330,8 @@ fieldset legend { font-size: 12px; color: var(--muted); padding: 0 6px; }
 .auth-section .section-title { font-size: 14px; font-weight: 650; margin: 0 0 4px; }
 .auth-section .section-hint { color: var(--muted); font-size: 12px; margin: 0 0 16px; }
 .auth-section .badge.auth-type { background: var(--btn-bg); color: var(--muted); font-weight: 500; }
-.vb-modalities { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+/* flex-direction: row 必须显式声明,否则继承 dialog label 的 column(竖排居中的根因) */
+.vb-modalities { display: flex; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
 .vb-modalities span { display: inline-flex; align-items: center; gap: 2px; font-size: 12px; }
 .vb-modalities input[type="checkbox"] { margin: 0; width: 12px; height: 12px; }
 #vb-reasoning { font: inherit; font-size: 12px; }
