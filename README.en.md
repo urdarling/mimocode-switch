@@ -22,6 +22,7 @@ parallel metadata file `mimocode-ui.json`.
 - Built-in provider auth management: view signed-in providers (auth.json, redacted) and
   log out with one click
 - Drag-and-drop card ordering
+- Dark/light theme toggle (follows system by default) and Chinese/English UI switch, persisted in localStorage
 
 ## Requirements
 

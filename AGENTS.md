@@ -13,7 +13,7 @@ mimocode 供应商管理工具 —— 带 UI 的 mimocode 第三方供应商管�
 
 - `server.ts`:单个 `Bun.serve` —— REST API + `public/` 静态文件,无框架
 - `lib/*.ts`:纯逻辑层,不依赖 Bun.serve,可独立单测;改逻辑优先改这里
-- `public/`:原生 HTML/CSS/JS,无框架无构建
+- `public/`:原生 HTML/CSS/JS,无框架无构建;`i18n.js` 提供中/英字典与 `t()`,主题经 `<html data-theme>` + CSS 变量切换,两者偏好存 localStorage(`ui-theme`/`ui-lang`)
 - `data/variants/`:`mimo.json` 由 `scripts/extract-mimo-catalog.ts` 生成(勿手改,mimo 升级后重跑 `bun run scripts/extract-mimo-catalog.ts`);`official.json` 经 UI「变体库」界面维护(或手编辑,字段说明见文件内 `//` 键),写入走 `lib/variants-store.ts`(原子写,保留 `//` 键)
 - `docs/compose/`:specs/plans/reports 是设计决策的权威来源(如 additive semantics 修订),改行为前先读
 
@@ -25,3 +25,4 @@ mimocode 供应商管理工具 —— 带 UI 的 mimocode 第三方供应商管�
 - **additive 语义**:默认供应商由 `model: "<id>/<modelId>"` 指针表示(`isDefault = model.startsWith(id + "/")`),没有独立的激活标志。删除默认供应商时 `model` 自动重定向到剩余第一个的首个模型(该供应商无模型或删光则清空,不写悬空 `"id/"`)
 - `mimocode-ui.json`(与 mimocode.jsonc 同目录):字段为 `order` / `notes` / `links`
 - API Key 明文存于 mimocode.jsonc;`/api/fetch-models` 仅代理供应商 `/models` 端点(15s 超时),不落盘
+- UI 文案一律经 `public/i18n.js` 的 `t()` 输出(后端报错文案保持中文除外);新增界面文本必须双语入字典并用 `data-i18n`/`t()` 接入
