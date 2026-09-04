@@ -9,3 +9,6 @@ data/variants/
 
 # 会话导出文件
 session-*.md
+
+# compose brainstorm 临时产物(效果图等)
+.compose/
